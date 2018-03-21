@@ -3,16 +3,15 @@ package com.example.there.aircraftradar.map
 import android.os.Parcel
 import android.os.Parcelable
 import com.example.there.aircraftradar.data.impl.flights.Flight
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.clustering.ClusterItem
+import net.sharewire.googlemapsclustering.ClusterItem
 
-class MapClusterItem(private val flight: Flight): ClusterItem, Parcelable {
-
+class MapClusterItem(val flight: Flight): ClusterItem, Parcelable {
     constructor(parcel: Parcel) : this(parcel.readParcelable(Flight::class.java.classLoader) as Flight)
 
     override fun getSnippet(): String = "${flight.origin} - ${flight.destination}"
     override fun getTitle(): String = flight.flight
-    override fun getPosition(): LatLng = LatLng(flight.latitude, flight.longitude)
+    override fun getLongitude(): Double = flight.longitude
+    override fun getLatitude(): Double = flight.latitude
 
     override fun writeToParcel(parcel: Parcel?, flags: Int) {
         parcel?.writeParcelable(flight, flags)

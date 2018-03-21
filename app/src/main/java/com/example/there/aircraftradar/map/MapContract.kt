@@ -12,8 +12,4 @@ interface MapContract {
     interface ViewModel {
         fun loadFlightsInBounds(bounds: LatLngBounds)
     }
-
-    interface Routing {
-
-    }
 }

@@ -1,5 +1,6 @@
 package com.example.there.aircraftradar.data
 
+import com.example.there.aircraftradar.data.impl.flightdetails.FlightDetailsResponse
 import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -10,5 +11,5 @@ interface FlightRadarApiService {
 
     @GET("clickhandler")
     fun loadFlightDetails(@Query("flight") flightId: String,
-                          @Query("version") version: String = "1.5")
+                          @Query("version") version: String = "1.5"): Observable<FlightDetailsResponse>
 }

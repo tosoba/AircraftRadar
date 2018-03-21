@@ -1,9 +1,9 @@
 package com.example.there.aircraftradar.data.impl.flightdetails
 
+import com.example.there.aircraftradar.data.FlightRadarApiService
 import com.example.there.aircraftradar.data.base.repository.BaseFlightDetailsRepository
+import io.reactivex.Observable
 
-class FlightDetailsRepository: BaseFlightDetailsRepository {
-    override fun loadFlightDetails(flightId: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+class FlightDetailsRepository(private val service: FlightRadarApiService): BaseFlightDetailsRepository {
+    override fun loadFlightDetails(flightId: String): Observable<FlightDetailsResponse> = service.loadFlightDetails(flightId)
 }

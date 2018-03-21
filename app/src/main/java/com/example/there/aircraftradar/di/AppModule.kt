@@ -3,9 +3,13 @@ package com.example.there.aircraftradar.di
 import android.app.Application
 import android.content.Context
 import com.example.there.aircraftradar.data.FlightRadarApiService
+import com.example.there.aircraftradar.data.base.repository.BaseFlightDetailsRepository
 import com.example.there.aircraftradar.data.base.repository.BaseFlightsRepository
+import com.example.there.aircraftradar.data.impl.flightdetails.FlightDetailsRepository
 import com.example.there.aircraftradar.data.impl.flights.FlightsMapper
 import com.example.there.aircraftradar.data.impl.flights.FlightsRepository
+import com.example.there.aircraftradar.flightdetails.FlightDetailsContract
+import com.example.there.aircraftradar.flightdetails.FlightDetailsInteractor
 import com.example.there.aircraftradar.map.MapContract
 import com.example.there.aircraftradar.map.MapInteractor
 import dagger.Module
@@ -55,4 +59,12 @@ class AppModule(private val app: Application) {
     @Provides
     @Singleton
     fun mapInteractor(flightsRepository: BaseFlightsRepository): MapContract.Interactor = MapInteractor(flightsRepository)
+
+    @Provides
+    @Singleton
+    fun flightDetailsRepository(apiService: FlightRadarApiService): BaseFlightDetailsRepository = FlightDetailsRepository(apiService)
+
+    @Provides
+    @Singleton
+    fun flightDetailsInteractor(repository: BaseFlightDetailsRepository): FlightDetailsContract.Interactor = FlightDetailsInteractor(repository)
 }
