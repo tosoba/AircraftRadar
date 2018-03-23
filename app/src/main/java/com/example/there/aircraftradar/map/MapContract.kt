@@ -6,10 +6,10 @@ import io.reactivex.Observable
 
 interface MapContract {
     interface Interactor {
-        fun loadFlightsInBounds(bounds: LatLngBounds): Observable<List<Flight>>
+        fun loadFlightsInBounds(bounds: LatLngBounds?): Observable<List<Flight>>
     }
 
     interface ViewModel {
-        fun loadFlightsInBounds(bounds: LatLngBounds)
+        fun loadFlightsInBounds(bounds: LatLngBounds?)
     }
 }

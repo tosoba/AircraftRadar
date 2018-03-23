@@ -11,7 +11,9 @@ class FlightsMapper: OneWayMapper<String, List<Flight>> {
         val keys = response.keys().asSequence().drop(2)
         keys.forEach { id ->
             val flight = response.getJSONArray(id)
-            if (flight.length() != 18) return@forEach
+            if (flight.length() < 18) {
+                return@forEach
+            }
             flights.add(Flight(
                     id = id,
                     modeSCode = flight.getString(0),

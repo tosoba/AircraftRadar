@@ -6,5 +6,5 @@ import com.google.android.gms.maps.model.LatLngBounds
 import io.reactivex.Observable
 
 class MapInteractor(private val flightsRepository: BaseFlightsRepository): MapContract.Interactor {
-    override fun loadFlightsInBounds(bounds: LatLngBounds): Observable<List<Flight>> = flightsRepository.loadFlights(bounds)
+    override fun loadFlightsInBounds(bounds: LatLngBounds?): Observable<List<Flight>> = flightsRepository.loadFlights(bounds)
 }

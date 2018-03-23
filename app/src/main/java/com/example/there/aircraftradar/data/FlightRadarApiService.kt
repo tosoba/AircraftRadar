@@ -7,7 +7,7 @@ import retrofit2.http.Query
 
 interface FlightRadarApiService {
     @GET("zones/fcgi/feed.js")
-    fun loadFlights(@Query("bounds") bounds: String): Observable<String>
+    fun loadFlights(@Query("bounds") bounds: String? = null): Observable<String>
 
     @GET("clickhandler")
     fun loadFlightDetails(@Query("flight") flightId: String,

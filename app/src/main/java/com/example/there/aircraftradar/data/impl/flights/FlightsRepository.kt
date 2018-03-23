@@ -7,8 +7,10 @@ import io.reactivex.Observable
 
 class FlightsRepository(private val service: FlightRadarApiService,
                         private val mapper: FlightsMapper): BaseFlightsRepository {
-    override fun loadFlights(bounds: LatLngBounds): Observable<List<Flight>> {
-        val boundsStr = "${bounds.northeast.latitude},${bounds.southwest.latitude},${bounds.southwest.longitude},${bounds.northeast.longitude}"
+    override fun loadFlights(bounds: LatLngBounds?): Observable<List<Flight>> {
+        val boundsStr = if (bounds != null) {
+            "${bounds.northeast.latitude},${bounds.southwest.latitude},${bounds.southwest.longitude},${bounds.northeast.longitude}"
+        } else null
         return service.loadFlights(bounds = boundsStr).map(mapper::fromEntity)
     }
 }

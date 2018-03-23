@@ -19,9 +19,8 @@ class MapViewModel(private val interactor: MapContract.Interactor): ViewModel(),
         flightLoadingDisposables.clear()
     }
 
-    override fun loadFlightsInBounds(bounds: LatLngBounds) {
+    override fun loadFlightsInBounds(bounds: LatLngBounds?) {
         flightLoadingDisposables.clear()
-
         flightLoadingDisposables.add(interactor.loadFlightsInBounds(bounds)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

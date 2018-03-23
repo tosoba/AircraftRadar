@@ -5,5 +5,5 @@ import com.google.android.gms.maps.model.LatLngBounds
 import io.reactivex.Observable
 
 interface BaseFlightsRepository {
-    fun loadFlights(bounds: LatLngBounds): Observable<List<Flight>>
+    fun loadFlights(bounds: LatLngBounds?): Observable<List<Flight>>
 }
