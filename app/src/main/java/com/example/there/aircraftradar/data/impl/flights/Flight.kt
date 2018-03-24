@@ -2,6 +2,7 @@ package com.example.there.aircraftradar.data.impl.flights
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.google.android.gms.maps.model.LatLng
 
 data class Flight(
         val id: String,
@@ -68,6 +69,9 @@ data class Flight(
     }
 
     override fun describeContents(): Int = 0
+
+    val position: LatLng
+        get() = LatLng(latitude, longitude)
 
     companion object CREATOR : Parcelable.Creator<Flight> {
         override fun createFromParcel(parcel: Parcel): Flight = Flight(parcel)

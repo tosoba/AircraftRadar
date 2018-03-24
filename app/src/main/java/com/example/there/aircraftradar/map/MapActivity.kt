@@ -9,61 +9,36 @@ import android.os.CountDownTimer
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
+import com.androidmapsextensions.*
+import com.androidmapsextensions.Marker
+import com.androidmapsextensions.MarkerOptions
 import com.example.there.aircraftradar.R
 import com.example.there.aircraftradar.data.impl.flights.Flight
 import com.example.there.aircraftradar.flightdetails.FlightDetailsActivity
-import com.example.there.aircraftradar.map.cluster.MapClusterItem
-import com.example.there.aircraftradar.map.cluster.MapClusterRenderer
-import com.example.there.aircraftradar.util.extension.animate
+import com.example.there.aircraftradar.map.flight.FlightClusterOptionsProvider
+import com.example.there.aircraftradar.map.flight.FlightMarker
+import com.example.there.aircraftradar.util.extension.addFlight
 import com.example.there.aircraftradar.util.extension.bounds
 import com.example.there.aircraftradar.util.extension.hideView
+import com.example.there.aircraftradar.util.tryRun
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.clustering.ClusterManager
+import com.google.android.gms.maps.model.*
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.flight_details_dialog.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import java.util.function.LongFunction
 import javax.inject.Inject
 
 
 class MapActivity : AppCompatActivity() {
     private lateinit var map: GoogleMap
-    private var previousZoom: Float? = null
-    private val onCameraIdleListener: GoogleMap.OnCameraIdleListener by lazy {
-        GoogleMap.OnCameraIdleListener {
-            val currentZoom = map.cameraPosition.zoom
-            if (previousZoom == currentZoom) {
-                runOnUiThread { clusterManager?.onCameraIdle() }
-            } else {
-                doAsync {
-                    clusterManager?.onCameraIdle()
-                }
+    private lateinit var mapFragment: SupportMapFragment
+    private val currentFlightMarkers = HashMap<String, FlightMarker>()
 
-                previousZoom = currentZoom
-            }
-        }
-    }
-    private val onMarkerClickListener: GoogleMap.OnMarkerClickListener by lazy {
-        GoogleMap.OnMarkerClickListener { marker ->
-            map.moveCamera(CameraUpdateFactory.newLatLng(marker.position))
-            marker.hideInfoWindow()
-            val clusterItem: MapClusterItem? = currentClusterItems.find { it.title == marker.title }
-            clusterItem?.let { showFlightDetailsDialog(it.flight) }
-            true
-        }
-    }
-
-    private var clusterManager: ClusterManager<MapClusterItem>? = null
-    private val currentClusterItems = ArrayList<MapClusterItem>()
+    private var declusterifiedMarkers = ArrayList<Marker>()
 
     private lateinit var loadingTimer: CountDownTimer
     private var timeTillNextLoad: Long = 10000L
@@ -80,14 +55,83 @@ class MapActivity : AppCompatActivity() {
 
         initLoadingState(savedInstanceState)
 
+        initMapFragment()
         initMap(savedInstanceState)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState?.putParcelableArray(KEY_CURRENT_CLUSTER_ITEMS, currentClusterItems.toTypedArray())
+        outState?.putParcelableArray(KEY_CURRENT_FLIGHTS, currentFlightMarkers.map { it.value.flight }.toTypedArray())
         outState?.putLong(KEY_TIME_TILL_NEXT_LOAD, timeTillNextLoad)
         outState?.putBoolean(KEY_INITIAL_LOAD_COMPLETED, initialLoadCompleted)
+    }
+
+    private fun declusterify(cluster: Marker) {
+        clusterifyMarkers()
+        declusterifiedMarkers.addAll(cluster.markers)
+        declusterifiedMarkers.forEach {
+            tryRun {
+                it?.clusterGroup = ClusterGroup.NOT_CLUSTERED
+            }
+        }
+    }
+
+    private fun clusterifyMarkers() {
+        if (declusterifiedMarkers.isNotEmpty()) {
+            declusterifiedMarkers.forEach {
+                tryRun {
+                    it?.clusterGroup = ClusterGroup.DEFAULT
+                }
+            }
+            declusterifiedMarkers.clear()
+        }
+    }
+
+    private fun initMapFragment() {
+        mapFragment = SupportMapFragment.newInstance()
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.add(R.id.map_container, mapFragment)
+        transaction.commit()
+    }
+
+    private fun initMap(savedInstanceState: Bundle?) {
+        mapFragment.getExtendedMapAsync {
+            setUpMap(it, savedInstanceState)
+        }
+    }
+
+    private fun setUpMap(googleMap: GoogleMap, savedInstanceState: Bundle?) {
+        map = googleMap
+        setupObservers()
+        initLoadingTimer()
+        loadMapStyle()
+
+        map.setClustering(ClusteringSettings()
+                .clusterOptionsProvider(FlightClusterOptionsProvider(resources))
+                .addMarkersDynamically(true))
+
+        map.setOnMarkerClickListener(GoogleMap.OnMarkerClickListener { marker ->
+            if (marker == null) return@OnMarkerClickListener true
+
+            if (marker.isCluster) {
+                val builder = LatLngBounds.builder()
+                marker.markers.forEach { builder.include(it.position) }
+                val bounds = builder.build()
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                declusterify(marker)
+            } else {
+                val flight = currentFlightMarkers.values.find { it.marker == marker }?.flight
+                flight?.let {
+                    map.moveCamera(CameraUpdateFactory.newLatLng(flight.position))
+                    showFlightDetailsDialog(it)
+                }
+            }
+            return@OnMarkerClickListener true
+        })
+
+        map.setOnMapClickListener { clusterifyMarkers() }
+
+        initClusterItems(savedInstanceState)
     }
 
     private fun initLoadingState(savedInstanceState: Bundle?) {
@@ -96,23 +140,21 @@ class MapActivity : AppCompatActivity() {
         if (initialLoadCompleted) loading_progress_bar.hideView()
     }
 
-    private fun initMap(savedInstanceState: Bundle?) {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync {
-            setupObservers()
+    private fun initClusterItems(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) {
+            if (!savedInstanceState.getBoolean(KEY_INITIAL_LOAD_COMPLETED)) return
 
-            map = it
-            previousZoom = map.cameraPosition.zoom
-            loadMapStyle()
-
-            initClusterManager()
-
-            map.setOnCameraIdleListener(onCameraIdleListener)
-            map.setOnMarkerClickListener(onMarkerClickListener)
-
-            initLoadingTimer()
-
-            initClusterItems(savedInstanceState)
+            map.clear()
+            if (savedInstanceState.containsKey(KEY_CURRENT_FLIGHTS)) {
+                val savedClusterItems = savedInstanceState.getParcelableArray(KEY_CURRENT_FLIGHTS).map { it as Flight }
+                savedClusterItems.forEach {
+                    val marker = map.addFlight(it)
+                    marker.clusterGroup = ClusterGroup.DEFAULT
+                    currentFlightMarkers[it.callsign] = FlightMarker(it, marker)
+                }
+            }
+        } else {
+            viewModel.loadFlightsInBounds(null)
         }
     }
 
@@ -136,12 +178,6 @@ class MapActivity : AppCompatActivity() {
         }
     }
 
-    private fun initClusterManager() {
-        clusterManager = ClusterManager(this, map)
-        clusterManager?.setAnimation(false)
-        clusterManager?.renderer = MapClusterRenderer(this, map, clusterManager!!, BitmapDescriptorFactory.fromResource(R.drawable.plane))
-    }
-
     private fun initLoadingTimer() {
         loadingTimer = object : CountDownTimer(timeTillNextLoad, 500) {
             override fun onFinish() {
@@ -157,55 +193,23 @@ class MapActivity : AppCompatActivity() {
         loadingTimer.start()
     }
 
-    private fun initClusterItems(savedInstanceState: Bundle?) {
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(KEY_CURRENT_CLUSTER_ITEMS)) {
-                val savedClusterItems = savedInstanceState.getParcelableArray(KEY_CURRENT_CLUSTER_ITEMS).map { it as MapClusterItem }
-                currentClusterItems.addAll(savedClusterItems)
-                clusterManager?.addItems(savedClusterItems)
-            }
-        } else {
-            viewModel.loadFlightsInBounds(null)
-        }
-    }
-
-    private fun addFlights(flights: List<Flight>) {
-        clusterManager?.let {
-            val markersToAnimate = clusterManager?.markerCollection?.markers?.filter {
-                map.bounds.contains(it.position) && !(clusterManager?.renderer as MapClusterRenderer).isMarkerClustered(it)
-            }
-            val markersToAnimateTitles = markersToAnimate?.map { it.title }
-
-            val markersToHide = clusterManager?.markerCollection?.markers?.filter {
-                !map.bounds.contains(it.position) && !(clusterManager?.renderer as MapClusterRenderer).isMarkerClustered(it)
-            }
-            markersToHide?.forEach { it.setIcon(transitionIcon) }
-
-            val (flightsToAdd, flightsRest) = flights.partition { markersToAnimateTitles?.contains(it.flight) == false }
-            markersToAnimate?.forEach { marker ->
-                val flight = flightsRest.find { it.flight == marker.title }
-                flight?.let {
-                    marker.animate(LatLng(flight.latitude, flight.longitude))
-                }
-            }
-
-            doAsync {
-                val (_, clusterItemsToRemove) = currentClusterItems.partition {
-                    markersToAnimateTitles?.contains(it.flight.flight) ?: false
-                }
-
-                val clustersItemsToAdd = flightsToAdd.map { MapClusterItem(it) }
-                val clusterItemsRest = flightsRest.map { MapClusterItem(it) }
-                clusterItemsToRemove.forEach { clusterManager?.removeItem(it) }
-                clusterManager?.addItems(clustersItemsToAdd)
-
-                currentClusterItems.clear()
-                currentClusterItems.addAll(clustersItemsToAdd.union(clusterItemsRest).toList())
-                if (!initialLoadCompleted) {
-                    uiThread { clusterManager?.cluster() }
-                    initialLoadCompleted = true
+    private fun addFlights(updatedFlights: List<Flight>) {
+        val bounds = map.bounds
+        doAsync {
+            updatedFlights.forEach { flight ->
+                if (currentFlightMarkers.containsKey(flight.callsign)) {
+                    currentFlightMarkers[flight.callsign]?.flight = flight
+                    uiThread {
+                        currentFlightMarkers[flight.callsign]?.marker?.let {
+                            if (bounds.contains(it.position) && !it.isCluster) it.animatePosition(flight.position)
+                            else it.animatePosition(flight.position, AnimationSettings().duration(1L))
+                        }
+                    }
                 } else {
-                    clusterManager?.cluster()
+                    uiThread {
+                        val marker = map.addFlight(flight)
+                        currentFlightMarkers[flight.callsign] = FlightMarker(flight, marker)
+                    }
                 }
             }
         }
@@ -234,12 +238,10 @@ class MapActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val KEY_CURRENT_CLUSTER_ITEMS = "KEY_CURRENT_CLUSTER_ITEMS"
+        private const val KEY_CURRENT_FLIGHTS = "KEY_CURRENT_FLIGHTS"
         private const val KEY_TIME_TILL_NEXT_LOAD = "KEY_TIME_TILL_NEXT_LOAD"
         private const val KEY_INITIAL_LOAD_COMPLETED = "KEY_INITIAL_LOAD_COMPLETED"
 
         private const val DEFAULT_TIME_TILL_NEXT_LOAD = 10000L
-
-        private val transitionIcon: BitmapDescriptor by lazy { BitmapDescriptorFactory.fromResource(R.drawable.transition) }
     }
 }

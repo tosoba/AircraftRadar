@@ -24,6 +24,8 @@ class MapViewModel(private val interactor: MapContract.Interactor): ViewModel(),
         flightLoadingDisposables.add(interactor.loadFlightsInBounds(bounds)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ flightsResponse.value = it }, { Log.e("loadFlightsInBounds", it?.message) }))
+                .subscribe({ flightsResponse.value = it }, {
+                    Log.e("loadFlightsInBounds", it?.message ?: "Error loading flights.")
+                }))
     }
 }
