@@ -13,6 +13,9 @@ project.ext {
 
 android {
     compileSdkVersion 26
+    dataBinding {
+        enabled = true
+    }
     defaultConfig {
         applicationId "com.example.there.aircraftradar"
         minSdkVersion 16

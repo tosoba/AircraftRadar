@@ -3,6 +3,7 @@ package com.example.there.aircraftradar.map
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.BottomSheetDialog
@@ -15,16 +16,16 @@ import com.example.there.aircraftradar.data.impl.flights.Flight
 import com.example.there.aircraftradar.flightdetails.FlightDetailsActivity
 import com.example.there.aircraftradar.map.cluster.MapClusterItem
 import com.example.there.aircraftradar.map.cluster.MapClusterRenderer
-import com.example.there.aircraftradar.util.animate
-import com.example.there.aircraftradar.util.bounds
-import com.example.there.aircraftradar.util.hideView
+import com.example.there.aircraftradar.util.extension.animate
+import com.example.there.aircraftradar.util.extension.bounds
+import com.example.there.aircraftradar.util.extension.hideView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.clustering.ClusterManager
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_map.*
@@ -36,9 +37,19 @@ import javax.inject.Inject
 
 class MapActivity : AppCompatActivity() {
     private lateinit var map: GoogleMap
+    private var previousZoom: Float? = null
     private val onCameraIdleListener: GoogleMap.OnCameraIdleListener by lazy {
         GoogleMap.OnCameraIdleListener {
-            clusterManager?.onCameraIdle()
+            val currentZoom = map.cameraPosition.zoom
+            if (previousZoom == currentZoom) {
+                runOnUiThread { clusterManager?.onCameraIdle() }
+            } else {
+                doAsync {
+                    clusterManager?.onCameraIdle()
+                }
+
+                previousZoom = currentZoom
+            }
         }
     }
     private val onMarkerClickListener: GoogleMap.OnMarkerClickListener by lazy {
@@ -60,7 +71,7 @@ class MapActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: MapViewModelFactory
-    private val viewModel: MapViewModel by lazy { ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java) }
+    private val viewModel: MapContract.ViewModel by lazy { ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -89,7 +100,10 @@ class MapActivity : AppCompatActivity() {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync {
             setupObservers()
+
             map = it
+            previousZoom = map.cameraPosition.zoom
+            loadMapStyle()
 
             initClusterManager()
 
@@ -106,12 +120,20 @@ class MapActivity : AppCompatActivity() {
         viewModel.flightsResponse.observe(this, Observer { flights ->
             flights?.let {
                 addFlights(it)
-                if (loading_progress_bar.visibility == View.VISIBLE) {
-                    loading_progress_bar.visibility = View.GONE
-                    initialLoadCompleted = true
-                }
+                loading_progress_bar.hideView()
             }
         })
+    }
+
+    private fun loadMapStyle() {
+        try {
+            val success = map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
+            if (!success) {
+                Log.e("ERROR", "Style parsing failed.")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Log.e("ERROR", "Can't find style. Error: ", e)
+        }
     }
 
     private fun initClusterManager() {
@@ -147,38 +169,65 @@ class MapActivity : AppCompatActivity() {
         }
     }
 
-    private fun addFlights(flights: List<Flight>) = clusterManager?.let {
-        clusterManager?.markerCollection?.markers?.forEach {
-            if (map.bounds.contains(it.position)) it.setIcon(transitionIcon)
-        }
+    private fun addFlights(flights: List<Flight>) {
+        clusterManager?.let {
+            val markersToAnimate = clusterManager?.markerCollection?.markers?.filter {
+                map.bounds.contains(it.position) && !(clusterManager?.renderer as MapClusterRenderer).isMarkerClustered(it)
+            }
+            val markersToAnimateTitles = markersToAnimate?.map { it.title }
 
-        doAsync {
-            val newClusterItems = flights.map { MapClusterItem(it) }
+            val markersToHide = clusterManager?.markerCollection?.markers?.filter {
+                !map.bounds.contains(it.position) && !(clusterManager?.renderer as MapClusterRenderer).isMarkerClustered(it)
+            }
+            markersToHide?.forEach { it.setIcon(transitionIcon) }
 
-            clusterManager?.clearItems()
-            clusterManager?.addItems(newClusterItems)
+            val (flightsToAdd, flightsRest) = flights.partition { markersToAnimateTitles?.contains(it.flight) == false }
+            markersToAnimate?.forEach { marker ->
+                val flight = flightsRest.find { it.flight == marker.title }
+                flight?.let {
+                    marker.animate(LatLng(flight.latitude, flight.longitude))
+                }
+            }
 
-            currentClusterItems.clear()
-            currentClusterItems.addAll(newClusterItems)
+            doAsync {
+                val (_, clusterItemsToRemove) = currentClusterItems.partition {
+                    markersToAnimateTitles?.contains(it.flight.flight) ?: false
+                }
 
-            uiThread { clusterManager?.cluster() }
+                val clustersItemsToAdd = flightsToAdd.map { MapClusterItem(it) }
+                val clusterItemsRest = flightsRest.map { MapClusterItem(it) }
+                clusterItemsToRemove.forEach { clusterManager?.removeItem(it) }
+                clusterManager?.addItems(clustersItemsToAdd)
+
+                currentClusterItems.clear()
+                currentClusterItems.addAll(clustersItemsToAdd.union(clusterItemsRest).toList())
+                if (!initialLoadCompleted) {
+                    uiThread { clusterManager?.cluster() }
+                    initialLoadCompleted = true
+                } else {
+                    clusterManager?.cluster()
+                }
+            }
         }
     }
 
     private fun showFlightDetailsDialog(flight: Flight) {
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.flight_details_dialog, null)
-        view.dialog_flight_id_txt.text = flight.id
-        view.dialog_more_btn.setOnClickListener {
-            dialog.dismiss()
-            startFlightDetaisActivity(flight)
+        with(view) {
+            dialog_callsign_txt.text = flight.callsign
+            dialog_position_txt.text = "${flight.latitude}, ${flight.longitude}"
+            dialog_more_btn.setOnClickListener {
+                dialog.dismiss()
+                startFlightDetailsActivity(flight)
+            }
         }
         dialog.window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         dialog.setContentView(view)
         dialog.show()
     }
 
-    private fun startFlightDetaisActivity(flight: Flight) {
+    private fun startFlightDetailsActivity(flight: Flight) {
         val intent = Intent(this, FlightDetailsActivity::class.java)
         intent.putExtra(FlightDetailsActivity.EXTRA_FLIGHT, flight)
         startActivity(intent)

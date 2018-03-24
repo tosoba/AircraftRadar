@@ -92,4 +92,7 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="action_settings">Settings</string>
+    <string name="more">More</string>
+    <string name="flight">Flight:</string>
+    <string name="position">Position:</string>
 </resources>

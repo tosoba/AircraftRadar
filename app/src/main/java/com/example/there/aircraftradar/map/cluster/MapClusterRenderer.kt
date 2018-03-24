@@ -3,6 +3,7 @@ package com.example.there.aircraftradar.map.cluster
 import android.content.Context
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
@@ -17,5 +18,9 @@ class MapClusterRenderer(context: Context,
             markerOptions?.icon(markerIcon)
             markerOptions?.rotation(item.flight.bearing.toFloat())
         }
+    }
+
+    fun isMarkerClustered(marker: Marker): Boolean {
+        return getCluster(marker) != null
     }
 }

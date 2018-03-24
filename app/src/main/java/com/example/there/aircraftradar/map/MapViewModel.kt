@@ -12,7 +12,7 @@ import io.reactivex.schedulers.Schedulers
 class MapViewModel(private val interactor: MapContract.Interactor): ViewModel(), MapContract.ViewModel {
     private val flightLoadingDisposables = CompositeDisposable()
 
-    val flightsResponse = MutableLiveData<List<Flight>>()
+    override val flightsResponse = MutableLiveData<List<Flight>>()
 
     override fun onCleared() {
         super.onCleared()

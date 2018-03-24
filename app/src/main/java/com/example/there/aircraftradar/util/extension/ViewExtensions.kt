@@ -1,4 +1,4 @@
-package com.example.there.aircraftradar.util
+package com.example.there.aircraftradar.util.extension
 
 import android.view.View
 
