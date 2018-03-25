@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.WindowManager
 import com.androidmapsextensions.*
-import com.androidmapsextensions.Marker
-import com.androidmapsextensions.MarkerOptions
 import com.example.there.aircraftradar.R
 import com.example.there.aircraftradar.data.impl.flights.Flight
 import com.example.there.aircraftradar.flightdetails.FlightDetailsActivity
@@ -23,13 +21,12 @@ import com.example.there.aircraftradar.util.extension.bounds
 import com.example.there.aircraftradar.util.extension.hideView
 import com.example.there.aircraftradar.util.tryRun
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.flight_details_dialog.view.*
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.util.function.LongFunction
 import javax.inject.Inject
 
 
@@ -37,8 +34,12 @@ class MapActivity : AppCompatActivity() {
     private lateinit var map: GoogleMap
     private lateinit var mapFragment: SupportMapFragment
     private val currentFlightMarkers = HashMap<String, FlightMarker>()
-
     private var declusterifiedMarkers = ArrayList<Marker>()
+    private val clusteringSettings: ClusteringSettings by lazy {
+        ClusteringSettings()
+                .clusterOptionsProvider(FlightClusterOptionsProvider(resources))
+                .addMarkersDynamically(true)
+    }
 
     private lateinit var loadingTimer: CountDownTimer
     private var timeTillNextLoad: Long = 10000L
@@ -46,7 +47,9 @@ class MapActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: MapViewModelFactory
-    private val viewModel: MapContract.ViewModel by lazy { ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java) }
+    private val viewModel: MapContract.ViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -106,9 +109,7 @@ class MapActivity : AppCompatActivity() {
         initLoadingTimer()
         loadMapStyle()
 
-        map.setClustering(ClusteringSettings()
-                .clusterOptionsProvider(FlightClusterOptionsProvider(resources))
-                .addMarkersDynamically(true))
+        map.setClustering(clusteringSettings)
 
         map.setOnMarkerClickListener(GoogleMap.OnMarkerClickListener { marker ->
             if (marker == null) return@OnMarkerClickListener true
@@ -195,24 +196,19 @@ class MapActivity : AppCompatActivity() {
 
     private fun addFlights(updatedFlights: List<Flight>) {
         val bounds = map.bounds
-        doAsync {
-            updatedFlights.forEach { flight ->
-                if (currentFlightMarkers.containsKey(flight.callsign)) {
-                    currentFlightMarkers[flight.callsign]?.flight = flight
-                    uiThread {
-                        currentFlightMarkers[flight.callsign]?.marker?.let {
-                            if (bounds.contains(it.position) && !it.isCluster) it.animatePosition(flight.position)
-                            else it.animatePosition(flight.position, AnimationSettings().duration(1L))
-                        }
-                    }
-                } else {
-                    uiThread {
-                        val marker = map.addFlight(flight)
-                        currentFlightMarkers[flight.callsign] = FlightMarker(flight, marker)
-                    }
+        updatedFlights.forEach { flight ->
+            if (currentFlightMarkers.containsKey(flight.callsign)) {
+                currentFlightMarkers[flight.callsign]?.flight = flight
+                currentFlightMarkers[flight.callsign]?.marker?.let {
+                    if (bounds.contains(it.position) && !it.isCluster) it.animatePosition(flight.position)
+                    else it.animatePosition(flight.position, AnimationSettings().duration(1L))
                 }
+            } else {
+                val marker = map.addFlight(flight)
+                currentFlightMarkers[flight.callsign] = FlightMarker(flight, marker)
             }
         }
+        map.setClustering(clusteringSettings)
     }
 
     private fun showFlightDetailsDialog(flight: Flight) {
