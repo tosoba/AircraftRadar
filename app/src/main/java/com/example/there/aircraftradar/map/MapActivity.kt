@@ -3,36 +3,33 @@ package com.example.there.aircraftradar.map
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.res.Resources
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.view.WindowManager
 import com.androidmapsextensions.*
 import com.example.there.aircraftradar.R
 import com.example.there.aircraftradar.data.impl.flights.Flight
 import com.example.there.aircraftradar.flightdetails.FlightDetailsActivity
 import com.example.there.aircraftradar.map.flight.FlightClusterOptionsProvider
+import com.example.there.aircraftradar.map.flight.FlightInfoDialogAdapter
 import com.example.there.aircraftradar.map.flight.FlightMarker
-import com.example.there.aircraftradar.util.extension.addFlight
-import com.example.there.aircraftradar.util.extension.bounds
-import com.example.there.aircraftradar.util.extension.hideView
+import com.example.there.aircraftradar.util.extension.*
 import com.example.there.aircraftradar.util.tryRun
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MapStyleOptions
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.flight_details_dialog.view.*
-import org.jetbrains.anko.doAsync
 import javax.inject.Inject
 
 
 class MapActivity : AppCompatActivity() {
     private lateinit var map: GoogleMap
-    private lateinit var mapFragment: SupportMapFragment
     private val currentFlightMarkers = HashMap<String, FlightMarker>()
     private var declusterifiedMarkers = ArrayList<Marker>()
     private val clusteringSettings: ClusteringSettings by lazy {
@@ -40,6 +37,24 @@ class MapActivity : AppCompatActivity() {
                 .clusterOptionsProvider(FlightClusterOptionsProvider(resources))
                 .addMarkersDynamically(true)
     }
+    private val onMarkerClickListener: GoogleMap.OnMarkerClickListener by lazy { GoogleMap.OnMarkerClickListener { marker ->
+        if (marker == null) return@OnMarkerClickListener true
+
+        if (marker.isCluster) {
+            val builder = LatLngBounds.builder()
+            marker.markers.forEach { builder.include(it.position) }
+            val bounds = builder.build()
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+            declusterify(marker)
+        } else {
+            val flight = currentFlightMarkers.values.find { it.marker == marker }?.flight
+            flight?.let {
+                map.moveCamera(CameraUpdateFactory.newLatLng(flight.position))
+                showFlightDetailsDialog(it)
+            }
+        }
+        return@OnMarkerClickListener true
+    } }
 
     private lateinit var loadingTimer: CountDownTimer
     private var timeTillNextLoad: Long = 10000L
@@ -58,7 +73,6 @@ class MapActivity : AppCompatActivity() {
 
         initLoadingState(savedInstanceState)
 
-        initMapFragment()
         initMap(savedInstanceState)
     }
 
@@ -90,49 +104,21 @@ class MapActivity : AppCompatActivity() {
         }
     }
 
-    private fun initMapFragment() {
-        mapFragment = SupportMapFragment.newInstance()
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.add(R.id.map_container, mapFragment)
-        transaction.commit()
-    }
-
     private fun initMap(savedInstanceState: Bundle?) {
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.radar_map_fragment) as SupportMapFragment
         mapFragment.getExtendedMapAsync {
-            setUpMap(it, savedInstanceState)
+            map = it
+            setupObservers()
+            initLoadingTimer()
+            map.loadMapStyle(this, R.raw.map_style)
+            map.initUiSettings()
+            map.setClustering(clusteringSettings)
+
+            map.setOnMarkerClickListener(onMarkerClickListener)
+            map.setOnMapClickListener { clusterifyMarkers() }
+
+            initClusterItems(savedInstanceState)
         }
-    }
-
-    private fun setUpMap(googleMap: GoogleMap, savedInstanceState: Bundle?) {
-        map = googleMap
-        setupObservers()
-        initLoadingTimer()
-        loadMapStyle()
-
-        map.setClustering(clusteringSettings)
-
-        map.setOnMarkerClickListener(GoogleMap.OnMarkerClickListener { marker ->
-            if (marker == null) return@OnMarkerClickListener true
-
-            if (marker.isCluster) {
-                val builder = LatLngBounds.builder()
-                marker.markers.forEach { builder.include(it.position) }
-                val bounds = builder.build()
-                map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-                declusterify(marker)
-            } else {
-                val flight = currentFlightMarkers.values.find { it.marker == marker }?.flight
-                flight?.let {
-                    map.moveCamera(CameraUpdateFactory.newLatLng(flight.position))
-                    showFlightDetailsDialog(it)
-                }
-            }
-            return@OnMarkerClickListener true
-        })
-
-        map.setOnMapClickListener { clusterifyMarkers() }
-
-        initClusterItems(savedInstanceState)
     }
 
     private fun initLoadingState(savedInstanceState: Bundle?) {
@@ -166,17 +152,6 @@ class MapActivity : AppCompatActivity() {
                 loading_progress_bar.hideView()
             }
         })
-    }
-
-    private fun loadMapStyle() {
-        try {
-            val success = map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
-            if (!success) {
-                Log.e("ERROR", "Style parsing failed.")
-            }
-        } catch (e: Resources.NotFoundException) {
-            Log.e("ERROR", "Can't find style. Error: ", e)
-        }
     }
 
     private fun initLoadingTimer() {
@@ -215,8 +190,8 @@ class MapActivity : AppCompatActivity() {
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.flight_details_dialog, null)
         with(view) {
-            dialog_callsign_txt.text = flight.callsign
-            dialog_position_txt.text = "${flight.latitude}, ${flight.longitude}"
+            flight_info_dialog_recycler_view.setLayoutManager(this@MapActivity, screenOrientation, 2)
+            flight_info_dialog_recycler_view.adapter = FlightInfoDialogAdapter(flight.info)
             dialog_more_btn.setOnClickListener {
                 dialog.dismiss()
                 startFlightDetailsActivity(flight)

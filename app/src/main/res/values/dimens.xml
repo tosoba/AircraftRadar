@@ -1,8 +1,11 @@
 <resources>
-    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="app_bar_height_vertical">180dp</dimen>
+    <dimen name="app_bar_height_horizontal">250dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
     <dimen name="cluster_text_size">15dp</dimen>
     <dimen name="distance_between_markers">36dp</dimen>
+
+    <dimen name="accent_line_height">2dp</dimen>
 </resources>

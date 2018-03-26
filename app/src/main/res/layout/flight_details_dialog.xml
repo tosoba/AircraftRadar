@@ -8,51 +8,14 @@
     android:paddingRight="15dp"
     android:paddingBottom="15dp">
 
-    <TextView
-        android:id="@+id/dialog_callsign_label_txt"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/flight_info_dialog_recycler_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/flight"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/dialog_position_label_txt"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/dialog_callsign_txt"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/dialog_callsign_txt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@id/dialog_position_txt"
-        app:layout_constraintLeft_toRightOf="@id/dialog_callsign_label_txt"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/dialog_position_label_txt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/position"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/dialog_callsign_label_txt"
-        app:layout_constraintBottom_toTopOf="@id/dialog_more_btn"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/dialog_position_txt" />
-
-    <TextView
-        android:id="@+id/dialog_position_txt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/dialog_callsign_txt"
-        app:layout_constraintBottom_toTopOf="@id/dialog_more_btn"
-        app:layout_constraintLeft_toRightOf="@id/dialog_position_label_txt"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/dialog_more_btn"/>
 
     <Button
         android:id="@+id/dialog_more_btn"
@@ -64,6 +27,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_position_label_txt" />
+        app:layout_constraintTop_toBottomOf="@id/flight_info_dialog_recycler_view" />
 
 </android.support.constraint.ConstraintLayout>

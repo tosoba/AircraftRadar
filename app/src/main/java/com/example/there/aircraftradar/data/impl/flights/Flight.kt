@@ -1,9 +1,12 @@
 package com.example.there.aircraftradar.data.impl.flights
 
-import android.os.Parcel
-import android.os.Parcelable
+import android.annotation.SuppressLint
+import com.example.there.aircraftradar.util.extension.format
+import com.example.there.aircraftradar.util.extension.formattedString
 import com.google.android.gms.maps.model.LatLng
+import io.mironov.smuggler.AutoParcelable
 
+@SuppressLint("ParcelCreator")
 data class Flight(
         val id: String,
         val modeSCode: String,
@@ -24,57 +27,18 @@ data class Flight(
         val rateOfClimb: Int, // ft/min
         val callsign: String,
         val isGlider: Boolean
-): Parcelable {
-    constructor(parcel: Parcel) : this(
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readDouble(),
-            parcel.readDouble(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readInt(),
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readInt(),
-            parcel.readString(),
-            parcel.readByte() != 0.toByte())
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(id)
-        parcel.writeString(modeSCode)
-        parcel.writeDouble(latitude)
-        parcel.writeDouble(longitude)
-        parcel.writeInt(bearing)
-        parcel.writeInt(altitude)
-        parcel.writeInt(speed)
-        parcel.writeString(squawkCode)
-        parcel.writeString(radar)
-        parcel.writeString(model)
-        parcel.writeString(registration)
-        parcel.writeInt(timestamp)
-        parcel.writeString(origin)
-        parcel.writeString(destination)
-        parcel.writeString(flight)
-        parcel.writeByte(if (isOnGround) 1 else 0)
-        parcel.writeInt(rateOfClimb)
-        parcel.writeString(callsign)
-        parcel.writeByte(if (isGlider) 1 else 0)
-    }
-
-    override fun describeContents(): Int = 0
+) : AutoParcelable {
 
     val position: LatLng
         get() = LatLng(latitude, longitude)
 
-    companion object CREATOR : Parcelable.Creator<Flight> {
-        override fun createFromParcel(parcel: Parcel): Flight = Flight(parcel)
-        override fun newArray(size: Int): Array<Flight?> = arrayOfNulls(size)
-    }
+    val info: List<Pair<String, String>>
+        get() = listOf(
+                Pair("Flight:", callsign),
+                Pair("Position:", position.formattedString),
+                Pair("Route:", "From $origin to $destination"),
+                Pair("Speed:", "$speed knots"),
+                Pair("Altitude:", "$altitude feet"),
+                Pair("Model:", model)
+        )
 }

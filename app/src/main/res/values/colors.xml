@@ -4,5 +4,7 @@
     <color name="colorPrimaryDark">#01090f</color>
     <color name="colorAccent">#146474</color>
 
+    <color name="polylineColor">#FFD700</color>
+
     <color name="dialogColor">#CC000000</color>
 </resources>

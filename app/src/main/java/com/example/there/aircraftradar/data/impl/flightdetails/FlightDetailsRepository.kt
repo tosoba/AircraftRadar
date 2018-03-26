@@ -5,5 +5,5 @@ import com.example.there.aircraftradar.data.base.repository.BaseFlightDetailsRep
 import io.reactivex.Observable
 
 class FlightDetailsRepository(private val service: FlightRadarApiService): BaseFlightDetailsRepository {
-    override fun loadFlightDetails(flightId: String): Observable<FlightDetailsResponse> = service.loadFlightDetails(flightId)
+    override fun loadFlightDetails(flightId: String): Observable<FlightDetails> = service.loadFlightDetails(flightId)
 }

@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/colorAccent" />
+            <solid android:color="@color/colorAccent"/>
         </shape>
     </item>
-    <item android:top="@dimen/accent_line_height">
+    <item android:left="3dp">
         <shape android:shape="rectangle">
-            <solid android:color="@color/colorPrimaryDark" />
+            <solid android:color="@color/colorPrimary"/>
+            <size android:width="10dp"/>
         </shape>
     </item>
+
 </layer-list>
