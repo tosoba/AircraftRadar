@@ -22,7 +22,8 @@
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="@android:color/transparent"
-            app:toolbarId="@+id/flight_details_toolbar">
+            app:toolbarId="@+id/flight_details_toolbar"
+            app:expandedTitleTextAppearance="@style/TextAppearance.Design.CollapsingToolbar.Expanded.Shadow">
 
             <ImageView
                 android:id="@+id/flight_details_aircraft_image_view"

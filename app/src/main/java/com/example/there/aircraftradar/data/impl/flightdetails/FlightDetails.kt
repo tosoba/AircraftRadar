@@ -2,6 +2,7 @@ package com.example.there.aircraftradar.data.impl.flightdetails
 
 import android.annotation.SuppressLint
 import com.example.there.aircraftradar.util.extension.formattedString
+import com.example.there.aircraftradar.util.extension.toDate
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 import io.mironov.smuggler.AutoParcelable
@@ -36,10 +37,14 @@ data class FlightDetails(
 
     val info: List<Pair<String, String>>
         get() = listOf(
-                Pair("From:", airport.destination?.name ?: "No destination airport info."),
-                Pair("To:", airport.origin?.name ?: "No origin airport info."),
+                Pair("From:", airport.origin?.name ?: "No destination airport info."),
+                Pair("To:", airport.destination?.name ?: "No origin airport info."),
                 Pair("Airline:", airline.name),
-                Pair("Aircraft:", aircraft.model.text)
+                Pair("Aircraft:", aircraft.model.text),
+                Pair("Departure:", time.scheduled?.departure?.toDate()?.toString()
+                        ?: "Unknown departure time."),
+                Pair("Arrival:", time.scheduled?.arrival?.toDate()?.toString()
+                        ?: "Unknown arrival time.")
         )
 }
 
@@ -54,14 +59,14 @@ data class Time(
 
 @SuppressLint("ParcelCreator")
 data class Real(
-        val departure: Int?,
-        val arrival: Int?
+        val departure: Long?,
+        val arrival: Long?
 ) : AutoParcelable
 
 @SuppressLint("ParcelCreator")
 data class Scheduled(
-        val departure: Int,
-        val arrival: Int
+        val departure: Long?,
+        val arrival: Long?
 ) : AutoParcelable
 
 @SuppressLint("ParcelCreator")
@@ -72,14 +77,14 @@ data class Historical(
 
 @SuppressLint("ParcelCreator")
 data class Estimated(
-        val departure: Int?,
-        val arrival: Int?
+        val departure: Long?,
+        val arrival: Long?
 ) : AutoParcelable
 
 @SuppressLint("ParcelCreator")
 data class Other(
-        val eta: Int,
-        val updated: Int
+        val eta: Int?,
+        val updated: Int?
 ) : AutoParcelable
 
 @SuppressLint("ParcelCreator")
@@ -125,7 +130,7 @@ data class Region(
 @SuppressLint("ParcelCreator")
 data class Timezone(
         val name: String,
-        val offset: Int,
+        val offset: Int?,
         val offsetHours: String,
         val abbr: String,
         val abbrName: String,
