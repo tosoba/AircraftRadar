@@ -9,11 +9,14 @@ import com.androidmapsextensions.GoogleMap
 import com.androidmapsextensions.Marker
 import com.androidmapsextensions.MarkerOptions
 import com.example.there.aircraftradar.R
-import com.example.there.aircraftradar.data.model.FlightDetails
 import com.example.there.aircraftradar.data.model.Flight
+import com.example.there.aircraftradar.data.model.FlightDetails
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsFragment
+import com.example.there.aircraftradar.util.extension.addFlight
+import com.example.there.aircraftradar.util.extension.initUiSettings
+import com.example.there.aircraftradar.util.extension.loadMapStyle
+import com.example.there.aircraftradar.util.extension.makeBounds
 import com.example.there.aircraftradar.view.ScrollViewMapFragment
-import com.example.there.aircraftradar.util.extension.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 

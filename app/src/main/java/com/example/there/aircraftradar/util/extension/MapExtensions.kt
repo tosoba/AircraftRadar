@@ -2,28 +2,27 @@ package com.example.there.aircraftradar.util.extension
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
 import android.util.Log
 import com.androidmapsextensions.GoogleMap
 import com.androidmapsextensions.Marker
 import com.androidmapsextensions.MarkerOptions
-import com.androidmapsextensions.PolylineOptions
 import com.example.there.aircraftradar.R
 import com.example.there.aircraftradar.data.model.Flight
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 
 private val flightIcon: BitmapDescriptor by lazy { BitmapDescriptorFactory.fromResource(R.drawable.plane) }
 
 val GoogleMap.bounds: LatLngBounds
     get() = projection.visibleRegion.latLngBounds
 
-fun GoogleMap.addFlight(flight: Flight): Marker {
-    return addMarker(MarkerOptions()
-            .title(flight.callsign)
-            .position(flight.position)
-            .icon(flightIcon)
-            .rotation(flight.bearing.toFloat()))
-}
+fun GoogleMap.addFlight(flight: Flight): Marker = addMarker(MarkerOptions()
+        .title(flight.callsign)
+        .position(flight.position)
+        .icon(flightIcon)
+        .rotation(flight.bearing.toFloat()))
 
 fun GoogleMap.loadMapStyle(context: Context, resourceId: Int) {
     try {

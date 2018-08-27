@@ -1,7 +1,6 @@
 package com.example.there.aircraftradar.data.model
 
 import android.annotation.SuppressLint
-import com.example.there.aircraftradar.util.extension.format
 import com.example.there.aircraftradar.util.extension.formattedString
 import com.google.android.gms.maps.model.LatLng
 import io.mironov.smuggler.AutoParcelable

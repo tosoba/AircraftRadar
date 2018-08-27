@@ -2,10 +2,10 @@ package com.example.there.aircraftradar.flightdetails.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import com.example.there.aircraftradar.data.model.FlightDetails
 import com.example.there.aircraftradar.data.model.Flight
+import com.example.there.aircraftradar.data.model.FlightDetails
 
-abstract class FlightDetailsFragment: Fragment() {
+abstract class FlightDetailsFragment : Fragment() {
 
     abstract var flightDetails: FlightDetails?
     protected lateinit var flight: Flight

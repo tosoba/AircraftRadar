@@ -36,24 +36,26 @@ class MapActivity : AppCompatActivity() {
                 .clusterOptionsProvider(FlightClusterOptionsProvider(resources))
                 .addMarkersDynamically(true)
     }
-    private val onMarkerClickListener: GoogleMap.OnMarkerClickListener by lazy { GoogleMap.OnMarkerClickListener { marker ->
-        if (marker == null) return@OnMarkerClickListener true
+    private val onMarkerClickListener: GoogleMap.OnMarkerClickListener by lazy {
+        GoogleMap.OnMarkerClickListener { marker ->
+            if (marker == null) return@OnMarkerClickListener true
 
-        if (marker.isCluster) {
-            val builder = LatLngBounds.builder()
-            marker.markers.forEach { builder.include(it.position) }
-            val bounds = builder.build()
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-            declusterify(marker)
-        } else {
-            val flight = currentFlightMarkers.values.find { it.marker == marker }?.flight
-            flight?.let {
-                map.moveCamera(CameraUpdateFactory.newLatLng(flight.position))
-                showFlightDetailsDialog(it)
+            if (marker.isCluster) {
+                val builder = LatLngBounds.builder()
+                marker.markers.forEach { builder.include(it.position) }
+                val bounds = builder.build()
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                declusterify(marker)
+            } else {
+                val flight = currentFlightMarkers.values.find { it.marker == marker }?.flight
+                flight?.let {
+                    map.moveCamera(CameraUpdateFactory.newLatLng(flight.position))
+                    showFlightDetailsDialog(it)
+                }
             }
+            return@OnMarkerClickListener true
         }
-        return@OnMarkerClickListener true
-    } }
+    }
 
     private lateinit var loadingTimer: CountDownTimer
     private var timeTillNextLoad: Long = 10000L

@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class FlightsRepository @Inject constructor(
         private val service: FlightRadarApiService
-): BaseFlightsRepository {
+) : BaseFlightsRepository {
 
     override fun loadFlights(bounds: LatLngBounds?): Observable<List<Flight>> {
         val boundsStr = if (bounds != null) {

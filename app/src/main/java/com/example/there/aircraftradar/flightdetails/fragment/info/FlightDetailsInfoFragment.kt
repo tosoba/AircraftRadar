@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.there.aircraftradar.R
-import com.example.there.aircraftradar.data.model.FlightDetails
 import com.example.there.aircraftradar.data.model.Flight
+import com.example.there.aircraftradar.data.model.FlightDetails
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsFragment
 import com.example.there.aircraftradar.util.extension.screenOrientation
 import com.example.there.aircraftradar.util.extension.setLayoutManager

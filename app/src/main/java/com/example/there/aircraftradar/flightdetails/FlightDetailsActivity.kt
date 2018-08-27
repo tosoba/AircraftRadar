@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.app.AppCompatActivity
 import com.example.there.aircraftradar.R
-import com.example.there.aircraftradar.data.model.FlightDetails
 import com.example.there.aircraftradar.data.model.Flight
+import com.example.there.aircraftradar.data.model.FlightDetails
 import com.example.there.aircraftradar.di.vm.ViewModelFactory
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsCurrentFragment
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsFragment
@@ -27,7 +27,7 @@ class FlightDetailsActivity : AppCompatActivity() {
     private val viewModel: FlightDetailsViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(FlightDetailsViewModel::class.java)
     }
-    
+
     private var currentFragment: FlightDetailsCurrentFragment = FlightDetailsCurrentFragment.INFO
 
     private val flight: Flight by lazy { intent.getParcelableExtra(EXTRA_FLIGHT) as Flight }
@@ -40,7 +40,7 @@ class FlightDetailsActivity : AppCompatActivity() {
 
         initFromSavedState(savedInstanceState)
         showFragment()
-        
+
         initViews()
 
         setupObservers()
@@ -51,7 +51,7 @@ class FlightDetailsActivity : AppCompatActivity() {
         outState?.putSerializable(KEY_CURRENT_FRAGMENT, currentFragment)
         outState?.putParcelable(KEY_FLIGHT_DETAILS, flightDetails)
     }
-    
+
     private fun initFromSavedState(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             currentFragment = savedInstanceState.getSerializable(KEY_CURRENT_FRAGMENT) as FlightDetailsCurrentFragment
@@ -73,9 +73,11 @@ class FlightDetailsActivity : AppCompatActivity() {
             FlightDetailsCurrentFragment.MAP -> {
                 if (showingFragment is FlightDetailsMapFragment) return
                 transaction.replace(R.id.flight_details_fragment_container,
-                        FlightDetailsMapFragment.newInstance(flight, flightDetails).apply { onMapTouch = {
-                            findViewById<NestedScrollView>(R.id.flight_details_scrollview)?.requestDisallowInterceptTouchEvent(true)
-                        } }, TAG_FLIGHT_DETAILS_FRAGMENT)
+                        FlightDetailsMapFragment.newInstance(flight, flightDetails).apply {
+                            onMapTouch = {
+                                findViewById<NestedScrollView>(R.id.flight_details_scrollview)?.requestDisallowInterceptTouchEvent(true)
+                            }
+                        }, TAG_FLIGHT_DETAILS_FRAGMENT)
             }
         }
         transaction.commit()
@@ -154,9 +156,9 @@ class FlightDetailsActivity : AppCompatActivity() {
     companion object {
         private const val KEY_CURRENT_FRAGMENT = "KEY_CURRENT_FRAGMENT"
         private const val KEY_FLIGHT_DETAILS = "KEY_FLIGHT_DETAILS"
-        
+
         const val EXTRA_FLIGHT = "EXTRA_FLIGHT"
-        
+
         private const val TAG_FLIGHT_DETAILS_FRAGMENT = "TAG_FLIGHT_DETAILS_FRAGMENT"
     }
 }

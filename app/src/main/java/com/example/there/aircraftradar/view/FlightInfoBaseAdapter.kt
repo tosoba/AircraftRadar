@@ -16,7 +16,7 @@ abstract class FlightInfoBaseAdapter<VH>(
         holder.infoTxt.text = item.second
     }
 
-    abstract class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         abstract val infoLabelTxt: TextView
         abstract val infoTxt: TextView
     }

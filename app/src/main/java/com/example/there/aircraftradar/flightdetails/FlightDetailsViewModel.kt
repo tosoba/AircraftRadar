@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class FlightDetailsViewModel @Inject constructor(
         private val interactor: FlightDetailsContract.Interactor
-): ViewModel(), FlightDetailsContract.ViewModel {
+) : ViewModel(), FlightDetailsContract.ViewModel {
 
     private val flightDetailsLoadingDisposables = CompositeDisposable()
 
