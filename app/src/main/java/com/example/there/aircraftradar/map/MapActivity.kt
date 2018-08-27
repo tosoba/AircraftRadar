@@ -3,17 +3,15 @@ package com.example.there.aircraftradar.map
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import android.view.WindowManager
 import com.androidmapsextensions.*
 import com.example.there.aircraftradar.R
-import com.example.there.aircraftradar.data.impl.flights.Flight
+import com.example.there.aircraftradar.data.model.Flight
+import com.example.there.aircraftradar.di.vm.ViewModelFactory
 import com.example.there.aircraftradar.flightdetails.FlightDetailsActivity
 import com.example.there.aircraftradar.map.flight.FlightClusterOptionsProvider
 import com.example.there.aircraftradar.map.flight.FlightInfoDialogAdapter
@@ -29,6 +27,7 @@ import javax.inject.Inject
 
 
 class MapActivity : AppCompatActivity() {
+
     private lateinit var map: GoogleMap
     private val currentFlightMarkers = HashMap<String, FlightMarker>()
     private var declusterifiedMarkers = ArrayList<Marker>()
@@ -61,7 +60,7 @@ class MapActivity : AppCompatActivity() {
     private var initialLoadCompleted: Boolean = false
 
     @Inject
-    lateinit var viewModelFactory: MapViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: MapContract.ViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java)
     }

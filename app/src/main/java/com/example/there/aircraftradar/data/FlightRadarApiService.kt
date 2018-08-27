@@ -1,6 +1,6 @@
 package com.example.there.aircraftradar.data
 
-import com.example.there.aircraftradar.data.impl.flightdetails.FlightDetails
+import com.example.there.aircraftradar.data.model.FlightDetails
 import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query

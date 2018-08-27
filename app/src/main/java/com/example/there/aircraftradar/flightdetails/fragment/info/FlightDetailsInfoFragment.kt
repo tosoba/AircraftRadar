@@ -1,15 +1,12 @@
 package com.example.there.aircraftradar.flightdetails.fragment.info
 
-import android.content.res.Configuration
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.there.aircraftradar.R
-import com.example.there.aircraftradar.data.impl.flightdetails.FlightDetails
-import com.example.there.aircraftradar.data.impl.flights.Flight
+import com.example.there.aircraftradar.data.model.FlightDetails
+import com.example.there.aircraftradar.data.model.Flight
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsFragment
 import com.example.there.aircraftradar.util.extension.screenOrientation
 import com.example.there.aircraftradar.util.extension.setLayoutManager
@@ -17,6 +14,7 @@ import kotlinx.android.synthetic.main.fragment_flight_details_info.view.*
 
 
 class FlightDetailsInfoFragment : FlightDetailsFragment() {
+
     private val infoListAdapter: FlightDetailsInfoAdapter by lazy {
         FlightDetailsInfoAdapter(flightDetails?.info ?: emptyList())
     }

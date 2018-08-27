@@ -10,7 +10,8 @@ import android.view.View
 import com.androidmapsextensions.SupportMapFragment
 
 
-class ScrollviewMapFragment : SupportMapFragment() {
+class ScrollViewMapFragment : SupportMapFragment() {
+
     var onTouch: (() -> Unit)? = null
         set(value) {
             if (field != null) return

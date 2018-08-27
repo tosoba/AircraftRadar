@@ -6,8 +6,9 @@ import android.os.Bundle
 import android.support.v4.widget.NestedScrollView
 import android.support.v7.app.AppCompatActivity
 import com.example.there.aircraftradar.R
-import com.example.there.aircraftradar.data.impl.flightdetails.FlightDetails
-import com.example.there.aircraftradar.data.impl.flights.Flight
+import com.example.there.aircraftradar.data.model.FlightDetails
+import com.example.there.aircraftradar.data.model.Flight
+import com.example.there.aircraftradar.di.vm.ViewModelFactory
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsCurrentFragment
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsFragment
 import com.example.there.aircraftradar.flightdetails.fragment.info.FlightDetailsInfoFragment
@@ -22,7 +23,7 @@ import javax.inject.Inject
 class FlightDetailsActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var viewModelFactory: FlightDetailsViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: FlightDetailsViewModel by lazy {
         ViewModelProviders.of(this, viewModelFactory).get(FlightDetailsViewModel::class.java)
     }

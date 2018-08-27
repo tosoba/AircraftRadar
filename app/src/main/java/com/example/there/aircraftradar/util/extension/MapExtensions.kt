@@ -9,8 +9,7 @@ import com.androidmapsextensions.Marker
 import com.androidmapsextensions.MarkerOptions
 import com.androidmapsextensions.PolylineOptions
 import com.example.there.aircraftradar.R
-import com.example.there.aircraftradar.data.impl.flightdetails.Trail
-import com.example.there.aircraftradar.data.impl.flights.Flight
+import com.example.there.aircraftradar.data.model.Flight
 import com.google.android.gms.maps.model.*
 
 private val flightIcon: BitmapDescriptor by lazy { BitmapDescriptorFactory.fromResource(R.drawable.plane) }
@@ -44,11 +43,4 @@ fun GoogleMap.initUiSettings() {
         isIndoorLevelPickerEnabled = false
         isMyLocationButtonEnabled = false
     }
-}
-
-fun GoogleMap.addRoutePolyline(positions: List<LatLng>) {
-    addPolyline(PolylineOptions()
-            .addAll(positions)
-            .color(Color.YELLOW)
-            .clickable(true))
 }

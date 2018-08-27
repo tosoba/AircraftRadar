@@ -1,4 +1,4 @@
-package com.example.there.aircraftradar.data.impl.flightdetails
+package com.example.there.aircraftradar.data.model
 
 import android.annotation.SuppressLint
 import com.example.there.aircraftradar.util.extension.formattedString
@@ -6,8 +6,6 @@ import com.example.there.aircraftradar.util.extension.toDate
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 import io.mironov.smuggler.AutoParcelable
-
-//TODO: NPE on Int property
 
 @SuppressLint("ParcelCreator")
 data class FlightDetails(
@@ -20,11 +18,10 @@ data class FlightDetails(
         val airspace: String?,
         val airport: Airport,
         val flightHistory: FlightHistory,
-        //val ems: Any,
         val availability: List<String>,
         val time: Time,
         val trail: List<Trail>,
-        val firstTimestamp: Int,
+        val firstTimestamp: Int?,
         val s: String
 ) : AutoParcelable {
     val imageUrl: String?
@@ -141,7 +138,7 @@ data class Timezone(
 data class Position(
         val latitude: Double,
         val longitude: Double,
-        val altitude: Int,
+        val altitude: Int?,
         val country: Country,
         val region: Region
 ) : AutoParcelable {
@@ -243,7 +240,6 @@ data class Status(
         val live: Boolean,
         val text: String,
         val icon: String,
-//		val estimated: Any,
         val ambiguous: Boolean,
         val generic: Generic
 ) : AutoParcelable

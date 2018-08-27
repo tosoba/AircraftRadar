@@ -9,16 +9,17 @@ import com.androidmapsextensions.GoogleMap
 import com.androidmapsextensions.Marker
 import com.androidmapsextensions.MarkerOptions
 import com.example.there.aircraftradar.R
-import com.example.there.aircraftradar.data.impl.flightdetails.FlightDetails
-import com.example.there.aircraftradar.data.impl.flights.Flight
+import com.example.there.aircraftradar.data.model.FlightDetails
+import com.example.there.aircraftradar.data.model.Flight
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsFragment
-import com.example.there.aircraftradar.view.ScrollviewMapFragment
+import com.example.there.aircraftradar.view.ScrollViewMapFragment
 import com.example.there.aircraftradar.util.extension.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 
 
 class FlightDetailsMapFragment : FlightDetailsFragment() {
+
     override var flightDetails: FlightDetails? = null
         set(value) {
             if (value == null || field != null) return
@@ -63,7 +64,7 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
     }
 
     private fun initMap() {
-        val mapFragment = childFragmentManager.findFragmentById(R.id.flight_details_map_fragment) as ScrollviewMapFragment
+        val mapFragment = childFragmentManager.findFragmentById(R.id.flight_details_map_fragment) as ScrollViewMapFragment
         mapFragment.onTouch = onMapTouch
         mapFragment.getExtendedMapAsync {
             map = it

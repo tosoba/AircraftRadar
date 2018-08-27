@@ -4,7 +4,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
 
-abstract class FlightInfoBaseAdapter<VH>(var items: List<Pair<String, String>>) : RecyclerView.Adapter<VH>() where VH : FlightInfoBaseAdapter.ViewHolder {
+abstract class FlightInfoBaseAdapter<VH>(
+        var items: List<Pair<String, String>>
+) : RecyclerView.Adapter<VH>() where VH : FlightInfoBaseAdapter.ViewHolder {
+
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: VH, position: Int) {

@@ -9,7 +9,10 @@ import com.example.there.aircraftradar.view.FlightInfoBaseAdapter
 import kotlinx.android.synthetic.main.dialog_flight_details_info_item.view.*
 
 
-class FlightInfoDialogAdapter(items: List<Pair<String, String>>): FlightInfoBaseAdapter<FlightInfoDialogAdapter.ViewHolder>(items) {
+class FlightInfoDialogAdapter(
+        items: List<Pair<String, String>>
+): FlightInfoBaseAdapter<FlightInfoDialogAdapter.ViewHolder>(items) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.dialog_flight_details_info_item, parent, false)
         return ViewHolder(view)

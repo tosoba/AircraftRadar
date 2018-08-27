@@ -1,4 +1,4 @@
-package com.example.there.aircraftradar.data.impl.flights
+package com.example.there.aircraftradar.data.model
 
 import android.annotation.SuppressLint
 import com.example.there.aircraftradar.util.extension.format

@@ -1,9 +1,10 @@
-package com.example.there.aircraftradar.data.impl.flights
+package com.example.there.aircraftradar.data
 
-import com.example.there.aircraftradar.data.base.mapper.OneWayMapper
+import com.example.there.aircraftradar.data.model.Flight
+import com.example.there.aircraftradar.domain.Mapper
 import org.json.JSONObject
 
-class FlightsMapper: OneWayMapper<String, List<Flight>> {
+object FlightsMapper: Mapper<String, List<Flight>> {
     override fun fromEntity(entity: String): List<Flight> {
         val response = JSONObject(entity)
         val flights = ArrayList<Flight>()

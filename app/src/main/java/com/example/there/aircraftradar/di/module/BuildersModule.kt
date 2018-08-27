@@ -1,17 +1,16 @@
-package com.example.there.aircraftradar.di
+package com.example.there.aircraftradar.di.module
 
 import com.example.there.aircraftradar.flightdetails.FlightDetailsActivity
-import com.example.there.aircraftradar.flightdetails.FlightDetailsModule
 import com.example.there.aircraftradar.map.MapActivity
-import com.example.there.aircraftradar.map.MapModule
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 @Module
 abstract class BuildersModule {
-    @ContributesAndroidInjector(modules = [MapModule::class])
+
+    @ContributesAndroidInjector
     abstract fun bindMapActivity(): MapActivity
 
-    @ContributesAndroidInjector(modules = [FlightDetailsModule::class])
+    @ContributesAndroidInjector
     abstract fun bindFlightDetailsActivity(): FlightDetailsActivity
 }
