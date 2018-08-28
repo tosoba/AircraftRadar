@@ -13,6 +13,7 @@ import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsCurre
 import com.example.there.aircraftradar.flightdetails.fragment.FlightDetailsFragment
 import com.example.there.aircraftradar.flightdetails.fragment.info.FlightDetailsInfoFragment
 import com.example.there.aircraftradar.flightdetails.fragment.map.FlightDetailsMapFragment
+import com.example.there.aircraftradar.lifecycle.ConnectivityComponent
 import com.example.there.aircraftradar.util.extension.hideView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -33,10 +34,18 @@ class FlightDetailsActivity : AppCompatActivity() {
     private val flight: Flight by lazy { intent.getParcelableExtra(EXTRA_FLIGHT) as Flight }
     private var flightDetails: FlightDetails? = null
 
+    private val connectivityComponent by lazy {
+        ConnectivityComponent(this, flightDetails != null, flight_details_root_layout, ConnectivityComponent.ReloadsData {
+            viewModel.loadFlightDetails(flight.id)
+        })
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flight_details)
+
+        lifecycle.addObserver(connectivityComponent)
 
         initFromSavedState(savedInstanceState)
         showFragment()
@@ -48,6 +57,7 @@ class FlightDetailsActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
+
         outState?.putSerializable(KEY_CURRENT_FRAGMENT, currentFragment)
         outState?.putParcelable(KEY_FLIGHT_DETAILS, flightDetails)
     }

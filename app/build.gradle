@@ -80,4 +80,7 @@ dependencies {
 
     // Marker clustering
     compile 'com.androidmapsextensions:android-maps-extensions:2.4.0'
+
+    // Reactive network
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:2.1.0'
 }

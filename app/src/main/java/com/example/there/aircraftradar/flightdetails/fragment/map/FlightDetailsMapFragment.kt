@@ -81,9 +81,9 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
     private fun displayRoute() {
         if (!routeDisplayed) {
             routeDisplayed = true
-            if (flightDetails != null && map != null) {
-                val origin = flightDetails!!.airport.origin
-                val destination = flightDetails!!.airport.destination
+            if (flightDetails != null && map != null && flightDetails!!.airport != null) {
+                val origin = flightDetails!!.airport!!.origin
+                val destination = flightDetails!!.airport!!.destination
 
                 flightMarker = map!!.addFlight(flight)
                 if (origin == null || destination == null) {
@@ -95,7 +95,7 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
                 map!!.addMarker(MarkerOptions().position(origin.latLng).title(origin.name))
                 map!!.addMarker(MarkerOptions().position(destination.latLng).title(destination.name))
 
-                routeBounds = LatLngBounds.builder().makeBounds(origin.latLng, flight.position, destination.latLng)
+                routeBounds = LatLngBounds.builder().makeBounds(origin.latLng!!, flight.position, destination.latLng!!)
 
                 moveCameraToRouteBounds()
             }

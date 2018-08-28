@@ -13,6 +13,7 @@ import com.example.there.aircraftradar.R
 import com.example.there.aircraftradar.data.model.Flight
 import com.example.there.aircraftradar.di.vm.ViewModelFactory
 import com.example.there.aircraftradar.flightdetails.FlightDetailsActivity
+import com.example.there.aircraftradar.lifecycle.ConnectivityComponent
 import com.example.there.aircraftradar.map.flight.FlightClusterOptionsProvider
 import com.example.there.aircraftradar.map.flight.FlightInfoDialogAdapter
 import com.example.there.aircraftradar.map.flight.FlightMarker
@@ -67,10 +68,18 @@ class MapActivity : AppCompatActivity() {
         ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java)
     }
 
+    private val connectivityComponent by lazy {
+        ConnectivityComponent(this, currentFlightMarkers.isNotEmpty(), map_root_layout) {
+            viewModel.loadFlightsInBounds(null)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
+
+        lifecycle.addObserver(connectivityComponent)
 
         initLoadingState(savedInstanceState)
 
@@ -142,7 +151,8 @@ class MapActivity : AppCompatActivity() {
                 }
             }
         } else {
-            viewModel.loadFlightsInBounds(null)
+            if (connectivityComponent.lastConnectionStatus)
+                viewModel.loadFlightsInBounds(null)
         }
     }
 
@@ -150,7 +160,7 @@ class MapActivity : AppCompatActivity() {
         viewModel.flightsResponse.observe(this, Observer { flights ->
             flights?.let {
                 addFlights(it)
-                loading_progress_bar.hideView()
+                loading_progress_bar?.hideView()
             }
         })
     }
@@ -158,7 +168,9 @@ class MapActivity : AppCompatActivity() {
     private fun initLoadingTimer() {
         loadingTimer = object : CountDownTimer(timeTillNextLoad, 500) {
             override fun onFinish() {
-                viewModel.loadFlightsInBounds(null)
+                if (connectivityComponent.lastConnectionStatus) {
+                    viewModel.loadFlightsInBounds(null)
+                }
                 timeTillNextLoad = DEFAULT_TIME_TILL_NEXT_LOAD
                 initLoadingTimer()
             }

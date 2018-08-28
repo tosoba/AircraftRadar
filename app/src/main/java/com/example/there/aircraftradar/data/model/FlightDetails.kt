@@ -9,23 +9,24 @@ import io.mironov.smuggler.AutoParcelable
 
 @SuppressLint("ParcelCreator")
 data class FlightDetails(
-        val identification: Identification,
-        val status: Status,
-        val level: String,
-        val aircraft: Aircraft,
-        val airline: Airline,
+        val identification: Identification?,
+        val status: Status?,
+        val level: String?,
+        val aircraft: Aircraft?,
+        val airline: Airline?,
         val owner: String?,
         val airspace: String?,
-        val airport: Airport,
-        val flightHistory: FlightHistory,
-        val availability: List<String>,
-        val time: Time,
-        val trail: List<Trail>,
+        val airport: Airport?,
+        val flightHistory: FlightHistory?,
+        val availability: List<String>?,
+        val time: Time?,
+        val trail: List<Trail>?,
         val firstTimestamp: Int?,
-        val s: String
+        val s: String?
 ) : AutoParcelable {
     val imageUrl: String?
-        get() = when {
+        get() = if (aircraft?.images == null) null
+        else when {
             aircraft.images.large.isNotEmpty() -> aircraft.images.large.first().src
             aircraft.images.medium.isNotEmpty() -> aircraft.images.medium.first().src
             aircraft.images.thumbnails.isNotEmpty() -> aircraft.images.thumbnails.first().src
@@ -34,13 +35,13 @@ data class FlightDetails(
 
     val info: List<Pair<String, String>>
         get() = listOf(
-                Pair("From:", airport.origin?.name ?: "No destination airport info."),
-                Pair("To:", airport.destination?.name ?: "No origin airport info."),
-                Pair("Airline:", airline.name),
-                Pair("Aircraft:", aircraft.model.text),
-                Pair("Departure:", time.scheduled?.departure?.toDate()?.toString()
+                Pair("From:", airport?.origin?.name ?: "No destination airport info."),
+                Pair("To:", airport?.destination?.name ?: "No origin airport info."),
+                Pair("Airline:", airline?.name ?: "No airline info."),
+                Pair("Aircraft:", aircraft?.model?.text ?: "No aircraft info."),
+                Pair("Departure:", time?.scheduled?.departure?.toDate()?.toString()
                         ?: "Unknown departure time."),
-                Pair("Arrival:", time.scheduled?.arrival?.toDate()?.toString()
+                Pair("Arrival:", time?.scheduled?.arrival?.toDate()?.toString()
                         ?: "Unknown arrival time.")
         )
 }
@@ -68,8 +69,8 @@ data class Scheduled(
 
 @SuppressLint("ParcelCreator")
 data class Historical(
-        val flighttime: String,
-        val delay: String
+        val flighttime: String?,
+        val delay: String?
 ) : AutoParcelable
 
 @SuppressLint("ParcelCreator")
@@ -86,30 +87,30 @@ data class Other(
 
 @SuppressLint("ParcelCreator")
 data class Airline(
-        val name: String,
-        val short: String,
-        val code: Code,
-        val url: String
+        val name: String?,
+        val short: String?,
+        val code: Code?,
+        val url: String?
 ) : AutoParcelable
 
 @SuppressLint("ParcelCreator")
 data class Code(
-        val iata: String,
-        val icao: String
+        val iata: String?,
+        val icao: String?
 ) : AutoParcelable
 
 @SuppressLint("ParcelCreator")
 data class AirportInfo(
-        val name: String,
-        val code: Code,
-        val position: Position,
-        val timezone: Timezone,
-        val visible: Boolean,
-        val website: String,
+        val name: String?,
+        val code: Code?,
+        val position: Position?,
+        val timezone: Timezone?,
+        val visible: Boolean?,
+        val website: String?,
         val info: Info?
 ) : AutoParcelable {
-    val latLng: LatLng
-        get() = position.latLng
+    val latLng: LatLng?
+        get() = position?.latLng
 }
 
 @SuppressLint("ParcelCreator")
@@ -121,7 +122,7 @@ data class Info(
 
 @SuppressLint("ParcelCreator")
 data class Region(
-        val city: String
+        val city: String?
 ) : AutoParcelable
 
 @SuppressLint("ParcelCreator")
