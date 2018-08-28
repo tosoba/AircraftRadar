@@ -66,6 +66,7 @@ class FlightDetailsActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             currentFragment = savedInstanceState.getSerializable(KEY_CURRENT_FRAGMENT) as FlightDetailsCurrentFragment
             flightDetails = savedInstanceState.getParcelable(KEY_FLIGHT_DETAILS) as FlightDetails
+            flight_details_loading_progress_bar?.hideView()
         } else {
             viewModel.loadFlightDetails(flight.id)
         }
@@ -128,6 +129,7 @@ class FlightDetailsActivity : AppCompatActivity() {
     private fun setupObservers() {
         viewModel.flightDetailsResponse.observe(this, Observer {
             it?.let {
+                flight_details_loading_progress_bar?.hideView()
                 flightDetails = it
                 updateViews(it)
                 updateFragment(it)
