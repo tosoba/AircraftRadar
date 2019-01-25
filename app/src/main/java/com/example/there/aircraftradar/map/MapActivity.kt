@@ -210,7 +210,7 @@ class MapActivity : AppCompatActivity() {
                 startFlightDetailsActivity(flight)
             }
         }
-        dialog.window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        dialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         dialog.setContentView(view)
         dialog.show()
     }

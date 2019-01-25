@@ -1,13 +1,14 @@
 package com.example.there.aircraftradar.data.model
 
-import android.annotation.SuppressLint
+import android.os.Parcelable
 import com.example.there.aircraftradar.util.extension.formattedString
 import com.example.there.aircraftradar.util.extension.toDate
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
-import io.mironov.smuggler.AutoParcelable
+import kotlinx.android.parcel.Parcelize
 
-@SuppressLint("ParcelCreator")
+
+@Parcelize
 data class FlightDetails(
         val identification: Identification?,
         val status: Status?,
@@ -23,7 +24,7 @@ data class FlightDetails(
         val trail: List<Trail>?,
         val firstTimestamp: Int?,
         val s: String?
-) : AutoParcelable {
+) : Parcelable {
     val imageUrl: String?
         get() = if (aircraft?.images == null) null
         else when {
@@ -46,60 +47,60 @@ data class FlightDetails(
         )
 }
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Time(
         val scheduled: Scheduled?,
         val real: Real?,
         val estimated: Estimated?,
         val other: Other?,
         val historical: Historical?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Real(
         val departure: Long?,
         val arrival: Long?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Scheduled(
         val departure: Long?,
         val arrival: Long?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Historical(
         val flighttime: String?,
         val delay: String?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Estimated(
         val departure: Long?,
         val arrival: Long?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Other(
         val eta: Int?,
         val updated: Int?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Airline(
         val name: String?,
         val short: String?,
         val code: Code?,
         val url: String?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Code(
         val iata: String?,
         val icao: String?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class AirportInfo(
         val name: String?,
         val code: Code?,
@@ -108,24 +109,24 @@ data class AirportInfo(
         val visible: Boolean?,
         val website: String?,
         val info: Info?
-) : AutoParcelable {
+) : Parcelable {
     val latLng: LatLng?
         get() = position?.latLng
 }
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Info(
         val terminal: String?,
         val baggage: String?,
         val gate: String?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Region(
         val city: String?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Timezone(
         val name: String,
         val offset: Int?,
@@ -133,45 +134,45 @@ data class Timezone(
         val abbr: String,
         val abbrName: String,
         val isDst: Boolean
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Position(
         val latitude: Double,
         val longitude: Double,
         val altitude: Int?,
         val country: Country,
         val region: Region
-) : AutoParcelable {
+) : Parcelable {
     val latLng: LatLng
         get() = LatLng(latitude, longitude)
 }
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Country(
         val name: String,
         val code: String
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class FlightHistory(
         @SerializedName("aircraft") val aircrafts: List<AircraftHistory>
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class AircraftHistory(
         val identification: Identification,
         val airport: Airport,
         val time: Time
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Airport(
         val origin: AirportInfo?,
         val destination: AirportInfo?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Trail(
         val lat: Double,
         val lng: Double,
@@ -179,7 +180,7 @@ data class Trail(
         val spd: Int,
         val ts: Int,
         val hd: Int
-) : AutoParcelable {
+) : Parcelable {
     val latLng: LatLng
         get() = LatLng(lat, lng)
 
@@ -191,7 +192,7 @@ data class Trail(
 }
 
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Aircraft(
         val model: Model,
         val registration: String,
@@ -199,67 +200,67 @@ data class Aircraft(
         val age: Int?,
         val msn: String?,
         val images: Images
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Model(
         val code: String,
         val text: String
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Images(
         val thumbnails: List<Thumbnail>,
         val medium: List<Thumbnail>,
         val large: List<Thumbnail>
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Thumbnail(
         val src: String,
         val link: String,
         val copyright: String,
         val source: String
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Identification(
         val id: String,
         val row: Long?,
         val number: Number,
         val callsign: String?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Number(
         val default: String,
         val alternative: String?
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Status(
         val live: Boolean,
         val text: String,
         val icon: String,
         val ambiguous: Boolean,
         val generic: Generic
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Generic(
         val status: GenericStatus,
         val eventTime: EventTime
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class GenericStatus(
         val text: String,
         val color: String,
         val type: String
-) : AutoParcelable
+) : Parcelable
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class EventTime(
         val utc: Int?,
         val local: Int?
-) : AutoParcelable
+) : Parcelable

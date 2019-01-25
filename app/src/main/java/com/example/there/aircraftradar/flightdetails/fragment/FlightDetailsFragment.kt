@@ -12,9 +12,12 @@ abstract class FlightDetailsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        arguments?.let {
+            flight = it.getParcelable(ARG_FLIGHT)
+            flightDetails = it.getParcelable(ARG_FLIGHT_DETAILS)
+        }
         if (arguments != null) {
-            flight = arguments.getParcelable(ARG_FLIGHT)
-            flightDetails = arguments.getParcelable(ARG_FLIGHT_DETAILS)
+
         }
     }
 

@@ -18,9 +18,10 @@ class ScrollViewMapFragment : SupportMapFragment() {
             field = value
         }
 
-    override fun onCreateView(inflater: LayoutInflater?, parent: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+    override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanceState: Bundle?): View? {
         val layout = super.onCreateView(inflater, parent, savedInstanceState)
-        val frameLayout = TouchableWrapper(activity)
+        val frameLayout = TouchableWrapper(inflater.context)
         frameLayout.setBackgroundColor(resources.getColor(android.R.color.transparent))
         (layout as ViewGroup).addView(frameLayout, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         return layout

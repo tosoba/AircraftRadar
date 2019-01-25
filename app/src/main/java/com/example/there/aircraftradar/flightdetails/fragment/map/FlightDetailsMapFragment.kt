@@ -48,17 +48,17 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
         routeDisplayed = savedInstanceState?.getBoolean(KEY_ROUTE_DISPLAYED) ?: false
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater?.inflate(R.layout.fragment_flight_details_map, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_flight_details_map, container, false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initMap()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState?.putBoolean(KEY_ROUTE_DISPLAYED, routeDisplayed)
+        outState.putBoolean(KEY_ROUTE_DISPLAYED, routeDisplayed)
     }
 
     override fun onPause() {
@@ -71,7 +71,7 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
         mapFragment.onTouch = onMapTouch
         mapFragment.getExtendedMapAsync {
             map = it
-            map?.loadMapStyle(this@FlightDetailsMapFragment.context, R.raw.map_style)
+            map?.loadMapStyle(this@FlightDetailsMapFragment.context!!, R.raw.map_style)
             map?.initUiSettings()
             map?.setOnMapClickListener { routeBounds?.let { moveCameraToRouteBounds() } }
             displayRoute()

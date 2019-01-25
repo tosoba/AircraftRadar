@@ -3,12 +3,12 @@ package com.example.there.aircraftradar.map
 import android.arch.lifecycle.MutableLiveData
 import com.example.there.aircraftradar.data.model.Flight
 import com.google.android.gms.maps.model.LatLngBounds
-import io.reactivex.Observable
+import io.reactivex.Single
 
 interface MapContract {
 
     interface Interactor {
-        fun loadFlightsInBounds(bounds: LatLngBounds?): Observable<List<Flight>>
+        fun loadFlightsInBounds(bounds: LatLngBounds?): Single<List<Flight>>
     }
 
     interface ViewModel {

@@ -1,11 +1,12 @@
 package com.example.there.aircraftradar.data.model
 
 import android.annotation.SuppressLint
+import android.os.Parcelable
 import com.example.there.aircraftradar.util.extension.formattedString
 import com.google.android.gms.maps.model.LatLng
-import io.mironov.smuggler.AutoParcelable
+import kotlinx.android.parcel.Parcelize
 
-@SuppressLint("ParcelCreator")
+@Parcelize
 data class Flight(
         val id: String,
         val modeSCode: String,
@@ -26,7 +27,7 @@ data class Flight(
         val rateOfClimb: Int, // ft/min
         val callsign: String,
         val isGlider: Boolean
-) : AutoParcelable {
+) : Parcelable {
 
     val position: LatLng
         get() = LatLng(latitude, longitude)

@@ -27,17 +27,17 @@ class FlightDetailsInfoFragment : FlightDetailsFragment() {
             infoListAdapter.notifyDataSetChanged()
         }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater?.inflate(R.layout.fragment_flight_details_info, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_flight_details_info, container, false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initViews(view)
     }
 
-    private fun initViews(view: View?) {
-        view?.flight_info_fragment_recyler_view?.setLayoutManager(context, activity.screenOrientation, 2)
-        view?.flight_info_fragment_recyler_view?.adapter = infoListAdapter
+    private fun initViews(view: View) {
+        view.flight_info_fragment_recyler_view?.setLayoutManager(view.context, activity!!.screenOrientation, 2)
+        view.flight_info_fragment_recyler_view?.adapter = infoListAdapter
     }
 
     companion object {

@@ -108,10 +108,12 @@ class FlightDetailsActivity : AppCompatActivity() {
     private fun initToggleFragmentButton() {
         updateToggleFragmentButtonIcon()
         flight_details_toggle_fab.setOnClickListener {
-            currentFragment = if (currentFragment == FlightDetailsCurrentFragment.INFO) {
-                FlightDetailsCurrentFragment.MAP
+            if (currentFragment == FlightDetailsCurrentFragment.INFO) {
+                currentFragment = FlightDetailsCurrentFragment.MAP
+                flight_details_toggle_fab.setImageResource(R.drawable.info)
             } else {
-                FlightDetailsCurrentFragment.INFO
+                currentFragment = FlightDetailsCurrentFragment.INFO
+                flight_details_toggle_fab.setImageResource(R.drawable.map)
             }
             updateToggleFragmentButtonIcon()
             showFragment()
@@ -127,8 +129,8 @@ class FlightDetailsActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.flightDetailsResponse.observe(this, Observer {
-            it?.let {
+        viewModel.flightDetailsResponse.observe(this, Observer { details ->
+            details?.let {
                 flight_details_loading_progress_bar?.hideView()
                 flightDetails = it
                 updateViews(it)

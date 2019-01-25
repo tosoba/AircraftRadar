@@ -19,8 +19,8 @@ class MapViewModel @Inject constructor(
     override val flightsResponse = MutableLiveData<List<Flight>>()
 
     override fun onCleared() {
-        super.onCleared()
         flightLoadingDisposables.clear()
+        super.onCleared()
     }
 
     override fun loadFlightsInBounds(bounds: LatLngBounds?) {

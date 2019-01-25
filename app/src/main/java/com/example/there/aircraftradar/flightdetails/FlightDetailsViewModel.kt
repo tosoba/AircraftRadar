@@ -18,8 +18,8 @@ class FlightDetailsViewModel @Inject constructor(
     val flightDetailsResponse = MutableLiveData<FlightDetails>()
 
     override fun onCleared() {
-        super.onCleared()
         flightDetailsLoadingDisposables.clear()
+        super.onCleared()
     }
 
     override fun loadFlightDetails(flightId: String) {

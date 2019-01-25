@@ -1,8 +1,7 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/map_root_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/map_root_layout">
+    android:layout_height="match_parent">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/radar_map_fragment"
@@ -14,11 +13,8 @@
         android:id="@+id/loading_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="parent" />
+        android:layout_gravity="center" />
 
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>
 
 
