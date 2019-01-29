@@ -1,1 +1,1 @@
-include ':app', ':coreandroid', ':core', ':map', ':flightdetails'
+include ':app', ':coreandroid', ':core', ':map', ':flightdetails', ':api'
