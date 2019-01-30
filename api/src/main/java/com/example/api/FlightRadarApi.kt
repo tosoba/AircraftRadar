@@ -1,15 +1,13 @@
 package com.example.api
 
-import com.example.core.model.FlightDetails
+import com.example.coreandroid.model.FlightDetails
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface FlightRadarApi {
     @GET("zones/fcgi/feed.js")
-    fun loadFlights(
-            @Query("bounds") bounds: String? = null
-    ): Call<String>
+    fun loadFlights(): Call<String>
 
     @GET("clickhandler")
     fun loadFlightDetails(

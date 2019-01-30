@@ -1,7 +1,7 @@
 package com.example.api.mapper
 
 import com.example.core.mapper.Mapper
-import com.example.core.model.Flight
+import com.example.coreandroid.model.Flight
 import org.json.JSONObject
 
 object FlightsMapper : Mapper<String, List<Flight>> {

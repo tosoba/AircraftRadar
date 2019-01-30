@@ -15,6 +15,11 @@ fun <T : Any> Result<T>.doOnError(consumer: (Throwable?) -> Unit) {
     if (this is Failure) consumer(error)
 }
 
+fun <T : Any, R : Any> Result<T>.mapSuccess(mapper: (T) -> R): Result<R> = when (this) {
+    is Success -> Success(mapper(this.data))
+    is Failure -> this
+}
+
 interface Mappable<out T : Any> {
     val isValid: Boolean
     val data: T

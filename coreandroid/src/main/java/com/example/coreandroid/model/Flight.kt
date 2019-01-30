@@ -1,5 +1,9 @@
-package com.example.core.model
+package com.example.coreandroid.model
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class Flight(
         val id: String,
         val modeSCode: String,
@@ -20,4 +24,4 @@ data class Flight(
         val rateOfClimb: Int, // ft/min
         val callsign: String,
         val isGlider: Boolean
-)
+) : Parcelable
