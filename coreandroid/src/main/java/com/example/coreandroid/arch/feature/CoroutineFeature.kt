@@ -1,19 +1,21 @@
 package com.example.coreandroid.arch.feature
 
+import com.example.coreandroid.arch.CoroutineMiddleware
 import com.example.coreandroid.arch.EventFactory
-import com.example.coreandroid.arch.Middleware
+import com.example.coreandroid.arch.FeatureAction
 import com.example.coreandroid.arch.Reducer
 import com.example.coreandroid.coroutine.CoroutineContextProvider
 import kotlinx.coroutines.*
+import org.greenrobot.eventbus.EventBus
 import kotlin.coroutines.CoroutineContext
 
-open class CoroutineFeature<State : Any, Action : Any, Event : Any>(
+
+abstract class CoroutineFeature<State : Any, Action : FeatureAction, Event : Any>(
         private val contextProvider: CoroutineContextProvider,
         initialState: State,
         reducer: Reducer<Action, State>,
-        middleware: Middleware<Action, State>? = null,
         eventFactory: EventFactory<Action, State, Event>? = null
-) : SimpleFeature<State, Action, Event>(initialState, reducer, middleware, eventFactory), CoroutineScope {
+) : BaseFeature<State, Action, Event>(initialState, reducer, eventFactory), CoroutineScope {
 
     private val jobs = mutableListOf<Job>()
 
@@ -21,6 +23,25 @@ open class CoroutineFeature<State : Any, Action : Any, Event : Any>(
     protected val background: CoroutineContext by lazy { contextProvider.io }
 
     override val coroutineContext: CoroutineContext by lazy { main }
+
+    open val middleware: CoroutineMiddleware<Action, State>? = null
+
+    override fun dispatchPrivate(action: Action) {
+        execute {
+            val actionToDispatch = loadDeferred {
+                middleware?.invoke(action, currentState, ::dispatchPrivate) ?: action
+            }
+            mutableState.value = reducer(actionToDispatch, currentState)
+            eventFactory?.invoke(actionToDispatch, currentState)?.let {
+                EventBus.getDefault().post(it)
+            }
+        }
+    }
+
+    fun dispose() {
+        jobs.forEach(::cancelJob)
+        jobs.clear()
+    }
 
     protected suspend fun <T : Any> defer(
             dataProvider: suspend () -> T
@@ -35,11 +56,6 @@ open class CoroutineFeature<State : Any, Action : Any, Event : Any>(
 
     protected fun execute(action: suspend () -> Unit) {
         jobs.add(launch(main) { action() })
-    }
-
-    fun dispose() {
-        jobs.forEach(::cancelJob)
-        jobs.clear()
     }
 
     private fun cancelJob(job: Job) {
