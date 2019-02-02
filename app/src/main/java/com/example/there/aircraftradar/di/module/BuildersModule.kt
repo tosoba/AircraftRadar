@@ -1,7 +1,7 @@
 package com.example.there.aircraftradar.di.module
 
-import com.example.there.aircraftradar.flightdetails.FlightDetailsActivity
-import com.example.there.aircraftradar.map.MapActivity
+import com.example.flightdetails.ui.FlightDetailsActivity
+import com.example.map.ui.MapActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 

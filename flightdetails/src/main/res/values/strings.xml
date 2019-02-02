@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">flightdetails</string>
+
+    <string name="no_airport_info">No airport info.</string>
+    <string name="no_route_info">No route info.</string>
+    <string name="more">More</string>
 </resources>

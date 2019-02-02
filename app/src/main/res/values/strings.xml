@@ -4,10 +4,8 @@
     <string name="title_activity_flight_details">Details</string>
 
     <string name="action_settings">Settings</string>
-    <string name="more">More</string>
     <string name="flight">Flight:</string>
     <string name="position">Position:</string>
 
-    <string name="no_airport_info">No airport info.</string>
-    <string name="no_route_info">No route info.</string>
+
 </resources>

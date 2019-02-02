@@ -1,6 +1,9 @@
 package com.example.coreandroid.model
 
 import android.os.Parcelable
+import com.example.coreandroid.ext.formattedString
+import com.example.coreandroid.ext.toDate
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
@@ -21,8 +24,28 @@ data class FlightDetails(
         val trail: List<Trail>?,
         val firstTimestamp: Int?,
         val s: String?
-) : Parcelable
+) : Parcelable {
+    val imageUrl: String?
+        get() = if (aircraft?.images == null) null
+        else when {
+            aircraft.images.large.isNotEmpty() -> aircraft.images.large.first().src
+            aircraft.images.medium.isNotEmpty() -> aircraft.images.medium.first().src
+            aircraft.images.thumbnails.isNotEmpty() -> aircraft.images.thumbnails.first().src
+            else -> null
+        }
 
+    val info: List<Pair<String, String>>
+        get() = listOf(
+                Pair("From:", airport?.origin?.name ?: "No destination airport info."),
+                Pair("To:", airport?.destination?.name ?: "No origin airport info."),
+                Pair("Airline:", airline?.name ?: "No airline info."),
+                Pair("Aircraft:", aircraft?.model?.text ?: "No aircraft info."),
+                Pair("Departure:", time?.scheduled?.departure?.toDate()?.toString()
+                        ?: "Unknown departure time."),
+                Pair("Arrival:", time?.scheduled?.arrival?.toDate()?.toString()
+                        ?: "Unknown arrival time.")
+        )
+}
 
 @Parcelize
 data class Time(
@@ -33,13 +56,11 @@ data class Time(
         val historical: Historical?
 ) : Parcelable
 
-
 @Parcelize
 data class Real(
         val departure: Long?,
         val arrival: Long?
 ) : Parcelable
-
 
 @Parcelize
 data class Scheduled(
@@ -47,13 +68,11 @@ data class Scheduled(
         val arrival: Long?
 ) : Parcelable
 
-
 @Parcelize
 data class Historical(
         val flighttime: String?,
         val delay: String?
 ) : Parcelable
-
 
 @Parcelize
 data class Estimated(
@@ -61,13 +80,11 @@ data class Estimated(
         val arrival: Long?
 ) : Parcelable
 
-
 @Parcelize
 data class Other(
         val eta: Int?,
         val updated: Int?
 ) : Parcelable
-
 
 @Parcelize
 data class Airline(
@@ -77,13 +94,11 @@ data class Airline(
         val url: String?
 ) : Parcelable
 
-
 @Parcelize
 data class Code(
         val iata: String?,
         val icao: String?
 ) : Parcelable
-
 
 @Parcelize
 data class AirportInfo(
@@ -94,7 +109,10 @@ data class AirportInfo(
         val visible: Boolean?,
         val website: String?,
         val info: Info?
-) : Parcelable
+) : Parcelable {
+    val latLng: LatLng?
+        get() = position?.latLng
+}
 
 @Parcelize
 data class Info(
@@ -103,12 +121,10 @@ data class Info(
         val gate: String?
 ) : Parcelable
 
-
 @Parcelize
 data class Region(
         val city: String?
 ) : Parcelable
-
 
 @Parcelize
 data class Timezone(
@@ -120,7 +136,6 @@ data class Timezone(
         val isDst: Boolean
 ) : Parcelable
 
-
 @Parcelize
 data class Position(
         val latitude: Double,
@@ -128,8 +143,10 @@ data class Position(
         val altitude: Int?,
         val country: Country,
         val region: Region
-) : Parcelable
-
+) : Parcelable {
+    val latLng: LatLng
+        get() = LatLng(latitude, longitude)
+}
 
 @Parcelize
 data class Country(
@@ -137,12 +154,10 @@ data class Country(
         val code: String
 ) : Parcelable
 
-
 @Parcelize
 data class FlightHistory(
         @SerializedName("aircraft") val aircrafts: List<AircraftHistory>
 ) : Parcelable
-
 
 @Parcelize
 data class AircraftHistory(
@@ -151,13 +166,11 @@ data class AircraftHistory(
         val time: Time
 ) : Parcelable
 
-
 @Parcelize
 data class Airport(
         val origin: AirportInfo?,
         val destination: AirportInfo?
 ) : Parcelable
-
 
 @Parcelize
 data class Trail(
@@ -167,7 +180,16 @@ data class Trail(
         val spd: Int,
         val ts: Int,
         val hd: Int
-) : Parcelable
+) : Parcelable {
+    val latLng: LatLng
+        get() = LatLng(lat, lng)
+
+    val title: String
+        get() = latLng.formattedString
+
+    val snippet: String
+        get() = "Height: $alt feet\nSpeed: $spd knots"
+}
 
 
 @Parcelize
@@ -180,13 +202,11 @@ data class Aircraft(
         val images: Images
 ) : Parcelable
 
-
 @Parcelize
 data class Model(
         val code: String,
         val text: String
 ) : Parcelable
-
 
 @Parcelize
 data class Images(
@@ -194,7 +214,6 @@ data class Images(
         val medium: List<Thumbnail>,
         val large: List<Thumbnail>
 ) : Parcelable
-
 
 @Parcelize
 data class Thumbnail(
@@ -204,7 +223,6 @@ data class Thumbnail(
         val source: String
 ) : Parcelable
 
-
 @Parcelize
 data class Identification(
         val id: String,
@@ -213,13 +231,11 @@ data class Identification(
         val callsign: String?
 ) : Parcelable
 
-
 @Parcelize
 data class Number(
         val default: String,
         val alternative: String?
 ) : Parcelable
-
 
 @Parcelize
 data class Status(
@@ -230,13 +246,11 @@ data class Status(
         val generic: Generic
 ) : Parcelable
 
-
 @Parcelize
 data class Generic(
         val status: GenericStatus,
         val eventTime: EventTime
 ) : Parcelable
-
 
 @Parcelize
 data class GenericStatus(
@@ -244,7 +258,6 @@ data class GenericStatus(
         val color: String,
         val type: String
 ) : Parcelable
-
 
 @Parcelize
 data class EventTime(

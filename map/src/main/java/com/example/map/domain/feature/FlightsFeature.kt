@@ -9,13 +9,13 @@ import com.example.coreandroid.arch.feature.BaseFeature
 import com.example.coreandroid.arch.feature.CoroutineFeature
 import com.example.coreandroid.coroutine.CoroutineContextProvider
 import com.example.coreandroid.model.Flight
-import com.example.map.data.MapRepository
+import com.example.map.domain.repo.IMapRepository
 import javax.inject.Inject
 
 
 class FlightsFeature @Inject constructor(
         contextProvider: CoroutineContextProvider,
-        private val mapRepository: MapRepository
+        private val mapRepository: IMapRepository
 ) : CoroutineFeature<FlightsFeature.State, FlightsFeature.Action, ErrorEvent>(
         contextProvider = contextProvider,
         initialState = FlightsFeature.State.INITIAL,
@@ -23,9 +23,7 @@ class FlightsFeature @Inject constructor(
             if (action is Action.SetFlights) previousState.copy(
                     loading = false,
                     flights = action.newFlights
-            )
-
-            previousState
+            ) else previousState
         },
         eventFactory = { action, _ ->
             if (action is Action.PostErrorEvent) ErrorEvent(action.throwable)

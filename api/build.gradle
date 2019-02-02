@@ -49,4 +49,10 @@ dependencies {
     implementation "com.google.dagger:dagger:$project.daggerVersion"
     implementation "com.google.dagger:dagger-android:$project.daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$project.daggerVersion"
+    kapt "com.google.dagger:dagger-android-processor:$project.daggerVersion"
+
+    // Dagger Android
+    annotationProcessor "com.google.dagger:dagger-android-processor:$project.daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
 }

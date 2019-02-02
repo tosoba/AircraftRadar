@@ -16,7 +16,7 @@ fun <T : Any> Result<T>.doOnError(consumer: (Throwable?) -> Unit) {
 }
 
 fun <T : Any, R : Any> Result<T>.mapSuccess(mapper: (T) -> R): Result<R> = when (this) {
-    is Success -> Success(mapper(this.data))
+    is Success -> Success(mapper(data))
     is Failure -> this
 }
 

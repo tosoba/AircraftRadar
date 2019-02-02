@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/flight_details_root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.flightdetails.ui.FlightDetailsActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/flight_details_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_bar_height_horizontal"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/flight_details_toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="@color/colorPrimary"
+            app:expandedTitleTextAppearance="@style/TextAppearance.Design.CollapsingToolbar.Expanded.Shadow"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:statusBarScrim="@android:color/transparent"
+            app:toolbarId="@+id/flight_details_toolbar">
+
+            <ImageView
+                android:id="@+id/flight_details_aircraft_image_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY" />
+
+            <View
+                android:id="@+id/gradient_top"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/top_dark_gradient" />
+
+            <View
+                android:id="@+id/gradient_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bottom_dark_gradient" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/accent_line_height"
+                android:layout_gravity="bottom"
+                android:background="@color/colorAccent" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/flight_details_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/flight_details_content" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/flight_details_toggle_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_anchor="@id/flight_details_app_bar"
+        app:layout_anchorGravity="bottom|end"
+        android:src="@drawable/map" />
+
+    <ProgressBar
+        android:id="@+id/flight_details_loading_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_gravity="top|center"
+        android:layout_margin="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="parent" />
+
+</android.support.design.widget.CoordinatorLayout>

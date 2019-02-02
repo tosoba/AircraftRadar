@@ -48,6 +48,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
+    implementation project(path: ':core')
+    implementation project(path: ':coreandroid')
+    implementation project(':map')
+    implementation project(':flightdetails')
+    implementation project(':api')
+
     // Picasso
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
@@ -69,7 +75,7 @@ dependencies {
     // Lifecycle
     implementation "android.arch.lifecycle:runtime:$project.lifecycleVersion"
     implementation "android.arch.lifecycle:extensions:$project.lifecycleVersion"
-    annotationProcessor "android.arch.lifecycle:compiler:$project.lifecycleVersion"
+    kapt "android.arch.lifecycle:compiler:$project.lifecycleVersion"
 
     implementation "com.shopify:livedata-ktx:1.0.1"
 
