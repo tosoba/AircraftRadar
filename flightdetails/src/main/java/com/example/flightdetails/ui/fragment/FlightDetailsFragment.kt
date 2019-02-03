@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.example.coreandroid.model.Flight
 import com.example.coreandroid.model.FlightDetails
-import com.example.flightdetails.ui.FlightDetailsContract
 
 abstract class FlightDetailsFragment : Fragment() {
 
     protected val flightDetails: LiveData<FlightDetails?>
-        get() = (activity as FlightDetailsContract.View).flightDetails
+        get() = (activity as SharesFlightDetails).flightDetails
 
     protected lateinit var flight: Flight
 
