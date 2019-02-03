@@ -8,10 +8,7 @@ import android.widget.Toast
 import com.androidmapsextensions.GoogleMap
 import com.androidmapsextensions.Marker
 import com.androidmapsextensions.MarkerOptions
-import com.example.coreandroid.ext.addFlight
-import com.example.coreandroid.ext.initUiSettings
-import com.example.coreandroid.ext.loadMapStyle
-import com.example.coreandroid.ext.makeBounds
+import com.example.coreandroid.ext.*
 import com.example.coreandroid.model.Flight
 import com.example.coreandroid.model.FlightDetails
 import com.example.coreandroid.view.ScrollViewMapFragment
@@ -23,16 +20,6 @@ import com.google.android.gms.maps.model.LatLngBounds
 
 class FlightDetailsMapFragment : FlightDetailsFragment() {
 
-    //TODO: use EventBus for this
-    override var flightDetails: FlightDetails? = null
-        set(value) {
-            if (value == null || field != null) return
-            field = value
-            displayRoute()
-        }
-
-    private var routeDisplayed = false
-
     private var map: GoogleMap? = null
     private var flightMarker: Marker? = null
     private var routeBounds: LatLngBounds? = null
@@ -43,12 +30,6 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
             field = value
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        routeDisplayed = savedInstanceState?.getBoolean(KEY_ROUTE_DISPLAYED) ?: false
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_flight_details_map, container, false)
     }
@@ -57,49 +38,40 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
         initMap()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_ROUTE_DISPLAYED, routeDisplayed)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        routeDisplayed = false
-    }
-
     private fun initMap() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.flight_details_map_fragment) as ScrollViewMapFragment
         mapFragment.onTouch = onMapTouch
         mapFragment.getExtendedMapAsync {
             map = it
-            map?.loadMapStyle(this@FlightDetailsMapFragment.context!!, R.raw.map_style)
-            map?.initUiSettings()
-            map?.setOnMapClickListener { routeBounds?.let { moveCameraToRouteBounds() } }
-            displayRoute()
+            it.loadMapStyle(this@FlightDetailsMapFragment.context!!, R.raw.map_style)
+            it.initUiSettings()
+            it.setOnMapClickListener { routeBounds?.let { moveCameraToRouteBounds() } }
+            setupObservers()
         }
     }
 
-    private fun displayRoute() {
-        if (!routeDisplayed) {
-            routeDisplayed = true
-            if (flightDetails != null && map != null && flightDetails!!.airport != null) {
-                val origin = flightDetails!!.airport!!.origin
-                val destination = flightDetails!!.airport!!.destination
+    private fun setupObservers() {
+        flightDetails.observeIgnoringNulls(this, ::displayRoute)
+    }
 
-                flightMarker = map!!.addFlight(flight)
-                if (origin == null || destination == null) {
-                    moveCameraToFlight()
-                    Toast.makeText(context, R.string.no_airport_info, Toast.LENGTH_LONG).show()
-                    return
-                }
+    private fun displayRoute(flightDetails: FlightDetails) {
+        if (map != null && flightDetails.airport != null) {
+            val origin = flightDetails.airport!!.origin
+            val destination = flightDetails.airport!!.destination
 
-                map!!.addMarker(MarkerOptions().position(origin.latLng).title(origin.name))
-                map!!.addMarker(MarkerOptions().position(destination.latLng).title(destination.name))
-
-                routeBounds = LatLngBounds.builder().makeBounds(origin.latLng!!, flight.position, destination.latLng!!)
-
-                moveCameraToRouteBounds()
+            flightMarker = map!!.addFlight(flight)
+            if (origin == null || destination == null) {
+                moveCameraToFlight()
+                Toast.makeText(context, R.string.no_airport_info, Toast.LENGTH_LONG).show()
+                return
             }
+
+            map!!.addMarker(MarkerOptions().position(origin.latLng).title(origin.name))
+            map!!.addMarker(MarkerOptions().position(destination.latLng).title(destination.name))
+
+            routeBounds = LatLngBounds.builder().makeBounds(origin.latLng!!, flight.position, destination.latLng!!)
+
+            moveCameraToRouteBounds()
         }
     }
 
@@ -112,8 +84,6 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
     }
 
     companion object {
-        private const val KEY_ROUTE_DISPLAYED = "KEY_ROUTE_DISPLAYED"
-
         fun newInstance(
                 flight: Flight
         ): FlightDetailsMapFragment = FlightDetailsMapFragment().apply { putArguments(flight) }

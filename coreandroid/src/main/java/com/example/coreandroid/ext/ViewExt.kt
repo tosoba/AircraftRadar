@@ -2,6 +2,8 @@ package com.example.coreandroid.ext
 
 import android.content.Context
 import android.content.res.Configuration
+import android.support.annotation.DrawableRes
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -17,4 +19,10 @@ fun RecyclerView.setLayoutManager(context: Context, screenOrientation: Int, colu
     } else {
         GridLayoutManager(context, columnsWhenHorizontal)
     }
+}
+
+fun FloatingActionButton.setDrawable(@DrawableRes drawableRes: Int) {
+    hide()
+    setImageResource(drawableRes)
+    show()
 }

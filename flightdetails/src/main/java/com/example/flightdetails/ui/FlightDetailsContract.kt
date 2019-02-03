@@ -11,4 +11,8 @@ interface FlightDetailsContract {
         val flightDetailsLoaded: Boolean
         fun loadFlightDetails(flightId: String)
     }
+
+    interface View {
+        val flightDetails: LiveData<FlightDetails?>
+    }
 }

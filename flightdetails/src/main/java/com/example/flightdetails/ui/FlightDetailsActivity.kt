@@ -1,5 +1,6 @@
 package com.example.flightdetails.ui
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -9,16 +10,17 @@ import android.support.v7.app.AppCompatActivity
 import com.example.core.di.Injectable
 import com.example.coreandroid.di.ViewModelFactory
 import com.example.coreandroid.ext.hideView
+import com.example.coreandroid.ext.setDrawable
 import com.example.coreandroid.lifecycle.ConnectivityComponent
 import com.example.coreandroid.model.Flight
 import com.example.coreandroid.model.FlightDetails
 import com.example.flightdetails.R
 import com.example.flightdetails.ui.fragment.FlightDetailsCurrentFragment
-import com.example.flightdetails.ui.fragment.FlightDetailsFragment
 import com.example.flightdetails.ui.fragment.info.FlightDetailsInfoFragment
 import com.example.flightdetails.ui.fragment.map.FlightDetailsMapFragment
 import com.shopify.livedataktx.distinct
 import com.shopify.livedataktx.filter
+import com.shopify.livedataktx.map
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import dagger.android.AndroidInjector
@@ -28,7 +30,7 @@ import kotlinx.android.synthetic.main.activity_flight_details.*
 import javax.inject.Inject
 
 
-class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector {
+class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector, FlightDetailsContract.View {
 
     @Inject
     lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
@@ -50,6 +52,9 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
             viewModel.loadFlightDetails(flight.id)
         })
     }
+
+    override val flightDetails: LiveData<FlightDetails?>
+        get() = viewModel.state.map { it?.flightDetails }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,12 +92,11 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
                     onMapTouch = {
                         findViewById<NestedScrollView>(R.id.flight_details_scrollview)?.requestDisallowInterceptTouchEvent(true)
                     }
-                    flightDetails = viewModel.flightDetails
                 },
                 TAG_FLIGHT_DETAILS_FRAGMENT
         )
         currentFragment = FlightDetailsCurrentFragment.MAP
-        flight_details_toggle_fab.setImageResource(R.drawable.info)
+        flight_details_toggle_fab.setDrawable(R.drawable.info)
         transaction.commit()
     }
 
@@ -100,12 +104,10 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(
                 R.id.flight_details_fragment_container,
-                FlightDetailsInfoFragment.newInstance(flight).apply {
-                    flightDetails = viewModel.flightDetails
-                },
+                FlightDetailsInfoFragment.newInstance(flight),
                 TAG_FLIGHT_DETAILS_FRAGMENT
         )
-        flight_details_toggle_fab.setImageResource(R.drawable.map)
+        flight_details_toggle_fab.setDrawable(R.drawable.map)
         currentFragment = FlightDetailsCurrentFragment.INFO
         transaction.commit()
     }
@@ -150,7 +152,6 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
                     state?.flightDetails?.let {
                         flight_details_loading_progress_bar?.hideView()
                         updateViews(it)
-                        updateFragment(it)
                     }
                 })
     }
@@ -176,11 +177,6 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
         flight_details_aircraft_image_view.setImageResource(R.drawable.aircraft_image_placeholder)
         gradient_top.hideView()
         gradient_bottom.hideView()
-    }
-
-    private fun updateFragment(flightDetails: FlightDetails) {
-        val showingFragment = supportFragmentManager.findFragmentByTag(TAG_FLIGHT_DETAILS_FRAGMENT) as? FlightDetailsFragment
-        showingFragment?.let { it.flightDetails = flightDetails }
     }
 
     companion object {

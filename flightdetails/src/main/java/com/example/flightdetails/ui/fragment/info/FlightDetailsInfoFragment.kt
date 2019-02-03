@@ -1,5 +1,6 @@
 package com.example.flightdetails.ui.fragment.info
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +8,6 @@ import android.view.ViewGroup
 import com.example.coreandroid.ext.screenOrientation
 import com.example.coreandroid.ext.setLayoutManager
 import com.example.coreandroid.model.Flight
-import com.example.coreandroid.model.FlightDetails
 import com.example.flightdetails.R
 import com.example.flightdetails.ui.fragment.FlightDetailsFragment
 import kotlinx.android.synthetic.main.fragment_flight_details_info.view.*
@@ -16,16 +16,9 @@ import kotlinx.android.synthetic.main.fragment_flight_details_info.view.*
 class FlightDetailsInfoFragment : FlightDetailsFragment() {
 
     private val infoListAdapter: FlightDetailsInfoAdapter by lazy {
-        FlightDetailsInfoAdapter(flightDetails?.info ?: emptyList())
+        FlightDetailsInfoAdapter(flightDetails.value?.info ?: emptyList())
     }
 
-    override var flightDetails: FlightDetails? = null
-        set(value) {
-            if (value == null || field != null) return
-            field = value
-            infoListAdapter.items = value.info
-            infoListAdapter.notifyDataSetChanged()
-        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_flight_details_info, container, false)
@@ -33,6 +26,16 @@ class FlightDetailsInfoFragment : FlightDetailsFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initViews(view)
+        setupObservers()
+    }
+
+    private fun setupObservers() {
+        flightDetails.observe(this, Observer { flightDetails ->
+            flightDetails?.let {
+                infoListAdapter.items = it.info
+                infoListAdapter.notifyDataSetChanged()
+            }
+        })
     }
 
     private fun initViews(view: View) {
