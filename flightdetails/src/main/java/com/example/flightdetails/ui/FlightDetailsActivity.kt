@@ -1,7 +1,6 @@
 package com.example.flightdetails.ui
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -10,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import com.example.core.di.Injectable
 import com.example.coreandroid.di.ViewModelFactory
 import com.example.coreandroid.ext.hideView
+import com.example.coreandroid.ext.observeNonNulls
 import com.example.coreandroid.ext.setDrawable
 import com.example.coreandroid.lifecycle.ConnectivityComponent
 import com.example.coreandroid.model.Flight
@@ -18,9 +18,8 @@ import com.example.flightdetails.R
 import com.example.flightdetails.ui.fragment.FlightDetailsCurrentFragment
 import com.example.flightdetails.ui.fragment.info.FlightDetailsInfoFragment
 import com.example.flightdetails.ui.fragment.map.FlightDetailsMapFragment
-import com.shopify.livedataktx.distinct
-import com.shopify.livedataktx.filter
 import com.shopify.livedataktx.map
+import com.shopify.livedataktx.nonNull
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import dagger.android.AndroidInjector
@@ -115,11 +114,9 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
     private fun showFragment(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
             showMapFragment()
-        } else {
-            when (currentFragment) {
-                FlightDetailsCurrentFragment.INFO -> showInfoFragment()
-                FlightDetailsCurrentFragment.MAP -> showMapFragment()
-            }
+        } else when (currentFragment) {
+            FlightDetailsCurrentFragment.INFO -> showInfoFragment()
+            FlightDetailsCurrentFragment.MAP -> showMapFragment()
         }
     }
 
@@ -146,14 +143,12 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
     }
 
     private fun setupObservers() {
-        viewModel.state.filter { it?.flightDetails != null }
-                .distinct()
-                .observe(this, Observer { state ->
-                    state?.flightDetails?.let {
-                        flight_details_loading_progress_bar?.hideView()
-                        updateViews(it)
-                    }
-                })
+        viewModel.state.map { it?.flightDetails }
+                .nonNull()
+                .observeNonNulls(this) {
+                    flight_details_loading_progress_bar?.hideView()
+                    updateViews(it)
+                }
     }
 
     private fun updateViews(flightDetails: FlightDetails) {

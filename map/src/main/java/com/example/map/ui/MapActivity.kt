@@ -1,6 +1,5 @@
 package com.example.map.ui
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -23,6 +22,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 import com.shopify.livedataktx.filter
 import com.shopify.livedataktx.map
+import com.shopify.livedataktx.nonNull
+import com.shopify.livedataktx.observe
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
@@ -145,14 +146,13 @@ class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector 
     }
 
     private fun setupObservers() {
-        viewModel.state.filter { it?.flights != null }
-                .map { it?.flights }
-                .observe(this, Observer { flights ->
-                    flights?.let {
-                        addFlights(it)
-                        loading_progress_bar?.hideView()
-                    }
-                })
+        viewModel.state.nonNull()
+                .map { it.flights }
+                .filter { it.isNotEmpty() }
+                .observe {
+                    addFlights(it)
+                    loading_progress_bar?.hideView()
+                }
     }
 
     private fun initLoadingTimer() {
@@ -173,15 +173,12 @@ class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector 
     }
 
     private fun addFlights(updatedFlights: List<Flight>) {
-        val bounds = map.bounds
         updatedFlights.forEach { flight ->
-            if (currentFlightMarkers.containsKey(flight.callsign)) {
-                currentFlightMarkers[flight.callsign]?.flight = flight
-                currentFlightMarkers[flight.callsign]?.marker?.let {
-                    if (bounds.contains(it.position) && !it.isCluster) it.animatePosition(flight.position)
-                    else it.animatePosition(flight.position, AnimationSettings().duration(1L))
-                }
-            } else {
+            currentFlightMarkers[flight.callsign]?.let {
+                it.flight = flight
+                if (map.bounds.contains(it.marker.position) && !it.marker.isCluster) it.marker.animatePosition(flight.position)
+                else it.marker.animatePosition(flight.position, AnimationSettings().duration(1L))
+            } ?: run {
                 val marker = map.addFlight(flight)
                 currentFlightMarkers[flight.callsign] = FlightMarker(flight, marker)
             }

@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 
 class FlightDetailsMapFragment : FlightDetailsFragment() {
 
-    private var map: GoogleMap? = null
+    private lateinit var map: GoogleMap
     private var flightMarker: Marker? = null
     private var routeBounds: LatLngBounds? = null
 
@@ -51,23 +51,23 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
     }
 
     private fun setupObservers() {
-        flightDetails.observeIgnoringNulls(this, ::displayRoute)
+        flightDetails.observeNonNulls(this, ::displayRoute)
     }
 
     private fun displayRoute(flightDetails: FlightDetails) {
-        if (map != null && flightDetails.airport != null) {
+        if (::map.isInitialized && flightDetails.airport != null) {
             val origin = flightDetails.airport!!.origin
             val destination = flightDetails.airport!!.destination
 
-            flightMarker = map!!.addFlight(flight)
+            flightMarker = map.addFlight(flight)
             if (origin == null || destination == null) {
                 moveCameraToFlight()
-                Toast.makeText(context, R.string.no_airport_info, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, R.string.no_airport_info, Toast.LENGTH_SHORT).show()
                 return
             }
 
-            map!!.addMarker(MarkerOptions().position(origin.latLng).title(origin.name))
-            map!!.addMarker(MarkerOptions().position(destination.latLng).title(destination.name))
+            map.addMarker(MarkerOptions().position(origin.latLng).title(origin.name))
+            map.addMarker(MarkerOptions().position(destination.latLng).title(destination.name))
 
             routeBounds = LatLngBounds.builder().makeBounds(origin.latLng!!, flight.position, destination.latLng!!)
 
@@ -76,11 +76,11 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
     }
 
     private fun moveCameraToRouteBounds() {
-        map?.moveCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, 300))
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, 300))
     }
 
     private fun moveCameraToFlight() {
-        map?.moveCamera(CameraUpdateFactory.newLatLng(flight.position))
+        map.moveCamera(CameraUpdateFactory.newLatLng(flight.position))
     }
 
     companion object {

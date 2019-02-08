@@ -3,14 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
-project.ext {
-    supportLibraryVersion = "28.0.0"
-    daggerVersion = "2.15"
-    rxJavaVersion = "2.1.0"
-    rxAndroidVersion = "2.0.1"
-    lifecycleVersion = "1.1.1"
-}
-
 android {
     compileSdkVersion 28
 
@@ -45,20 +37,20 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
     // Lifecycle
-    implementation "android.arch.lifecycle:runtime:$project.lifecycleVersion"
-    implementation "android.arch.lifecycle:extensions:$project.lifecycleVersion"
-    kapt "android.arch.lifecycle:compiler:$project.lifecycleVersion"
+    implementation "android.arch.lifecycle:runtime:$lifecycleVersion"
+    implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
+    kapt "android.arch.lifecycle:compiler:$lifecycleVersion"
 
     // Dagger core
-    implementation "com.google.dagger:dagger:$project.daggerVersion"
-    implementation "com.google.dagger:dagger-android:$project.daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
-    kapt "com.google.dagger:dagger-compiler:$project.daggerVersion"
-    kapt "com.google.dagger:dagger-android-processor:$project.daggerVersion"
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    implementation "com.google.dagger:dagger-android:$daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
 
     // Dagger Android
-    annotationProcessor "com.google.dagger:dagger-android-processor:$project.daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
 
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
 

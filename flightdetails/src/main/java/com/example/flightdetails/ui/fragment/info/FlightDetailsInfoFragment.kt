@@ -1,10 +1,10 @@
 package com.example.flightdetails.ui.fragment.info
 
-import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.coreandroid.ext.observeNonNulls
 import com.example.coreandroid.ext.screenOrientation
 import com.example.coreandroid.ext.setLayoutManager
 import com.example.coreandroid.model.Flight
@@ -19,7 +19,6 @@ class FlightDetailsInfoFragment : FlightDetailsFragment() {
         FlightDetailsInfoAdapter(flightDetails.value?.info ?: emptyList())
     }
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_flight_details_info, container, false)
     }
@@ -30,12 +29,10 @@ class FlightDetailsInfoFragment : FlightDetailsFragment() {
     }
 
     private fun setupObservers() {
-        flightDetails.observe(this, Observer { flightDetails ->
-            flightDetails?.let {
-                infoListAdapter.items = it.info
-                infoListAdapter.notifyDataSetChanged()
-            }
-        })
+        flightDetails.observeNonNulls(this) {
+            infoListAdapter.items = it.info
+            infoListAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun initViews(view: View) {

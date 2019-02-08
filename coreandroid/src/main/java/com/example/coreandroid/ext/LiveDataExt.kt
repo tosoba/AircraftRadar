@@ -4,7 +4,7 @@ import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 
-fun <T : Any> LiveData<T?>.observeIgnoringNulls(
+fun <T : Any> LiveData<T?>.observeNonNulls(
         lifecycleOwner: LifecycleOwner,
         onNext: (T) -> Unit
 ) {
