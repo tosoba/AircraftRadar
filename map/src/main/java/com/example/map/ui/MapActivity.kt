@@ -21,13 +21,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.shopify.livedataktx.filter
 import com.shopify.livedataktx.map
 import com.shopify.livedataktx.observe
-import dagger.android.HasAndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.flight_details_dialog.view.*
 import javax.inject.Inject
 
-class MapActivity : DaggerAppCompatActivity(), HasAndroidInjector, Injectable {
+class MapActivity : DaggerAppCompatActivity(), Injectable {
     private lateinit var map: GoogleMap
     private val currentFlightMarkers = HashMap<String, FlightMarker>()
     private var declusterifiedMarkers = ArrayList<Marker>()
@@ -64,8 +63,7 @@ class MapActivity : DaggerAppCompatActivity(), HasAndroidInjector, Injectable {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: MapContract.ViewModel by lazy {
-
-        ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory)[MapViewModel::class.java]
     }
 
     private val connectivityComponent by lazy {
