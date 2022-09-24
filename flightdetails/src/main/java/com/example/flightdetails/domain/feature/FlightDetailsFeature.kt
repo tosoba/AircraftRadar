@@ -14,22 +14,22 @@ import javax.inject.Inject
 
 
 class FlightDetailsFeature @Inject constructor(
-        contextProvider: CoroutineContextProvider,
-        private val flightDetailsRepository: IFlightDetailsRepository
+    contextProvider: CoroutineContextProvider,
+    private val flightDetailsRepository: IFlightDetailsRepository
 ) : CoroutineFeature<FlightDetailsFeature.State, FlightDetailsFeature.Action, ErrorEvent>(
-        contextProvider = contextProvider,
-        initialState = FlightDetailsFeature.State.INITIAL,
-        reducer = { action, previousState ->
-            if (action is Action.SetFlightDetails) previousState.copy(
-                    loading = false,
-                    flightDetails = action.flightDetails
-            )
-            else previousState
-        },
-        eventFactory = { action, _ ->
-            if (action is Action.PostErrorEvent) ErrorEvent(action.throwable)
-            null
-        }
+    contextProvider = contextProvider,
+    initialState = State.INITIAL,
+    reducer = { action, previousState ->
+        if (action is Action.SetFlightDetails) previousState.copy(
+            loading = false,
+            flightDetails = action.flightDetails
+        )
+        else previousState
+    },
+    eventFactory = { action, _ ->
+        if (action is Action.PostErrorEvent) ErrorEvent(action.throwable)
+        null
+    }
 ) {
     override val middleware: CoroutineMiddleware<Action, State>? = { action, _, dispatchPrivate ->
         when (action) {
@@ -40,8 +40,12 @@ class FlightDetailsFeature @Inject constructor(
                 when (flightDetailsResult) {
                     is Success -> Action.SetFlightDetails(flightDetailsResult.data)
                     is Failure -> {
-                        dispatchPrivate(Action.PostErrorEvent(flightDetailsResult.error
-                                ?: Exception(BaseFeature.UNKNOWN_ERROR_MSG)))
+                        dispatchPrivate(
+                            Action.PostErrorEvent(
+                                flightDetailsResult.error
+                                    ?: Exception(BaseFeature.UNKNOWN_ERROR_MSG)
+                            )
+                        )
                         null
                     }
                 }

@@ -1,12 +1,9 @@
 package com.example.flightdetails.ui
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.widget.NestedScrollView
-import android.support.v7.app.AppCompatActivity
-import com.example.core.di.Injectable
+import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProviders
 import com.example.coreandroid.di.ViewModelFactory
 import com.example.coreandroid.ext.hideView
 import com.example.coreandroid.ext.observeNonNulls
@@ -22,34 +19,29 @@ import com.shopify.livedataktx.map
 import com.shopify.livedataktx.nonNull
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_flight_details.*
 import javax.inject.Inject
 
-
-class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector, FlightDetailsContract.View {
-
-    @Inject
-    lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentDispatchingAndroidInjector
-
+class FlightDetailsActivity : DaggerAppCompatActivity(), FlightDetailsContract.View {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: FlightDetailsContract.ViewModel by lazy {
-        ViewModelProviders.of(this, viewModelFactory).get(FlightDetailsViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory)[FlightDetailsViewModel::class.java]
     }
 
     private var currentFragment: FlightDetailsCurrentFragment = FlightDetailsCurrentFragment.INFO
 
-    private val flight: Flight by lazy { intent.getParcelableExtra(EXTRA_FLIGHT) as Flight }
+    private val flight: Flight by lazy { intent.getParcelableExtra(EXTRA_FLIGHT)!! }
 
     private val connectivityComponent by lazy {
-        ConnectivityComponent(this, viewModel.flightDetailsLoaded, flight_details_root_layout, ConnectivityComponent.ReloadsData {
+        ConnectivityComponent(
+            this,
+            viewModel.flightDetailsLoaded,
+            flight_details_root_layout
+        ) {
             viewModel.loadFlightDetails(flight.id)
-        })
+        }
     }
 
     override val flightDetails: LiveData<FlightDetails?>
@@ -69,14 +61,15 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
         setupObservers()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState?.putSerializable(KEY_CURRENT_FRAGMENT, currentFragment)
+        outState.putSerializable(KEY_CURRENT_FRAGMENT, currentFragment)
     }
 
     private fun initFromSavedState(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
-            currentFragment = savedInstanceState.getSerializable(KEY_CURRENT_FRAGMENT) as FlightDetailsCurrentFragment
+            currentFragment =
+                savedInstanceState.getSerializable(KEY_CURRENT_FRAGMENT) as FlightDetailsCurrentFragment
             flight_details_loading_progress_bar?.hideView()
         } else {
             viewModel.loadFlightDetails(flight.id)
@@ -86,13 +79,15 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
     private fun showMapFragment() {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(
-                R.id.flight_details_fragment_container,
-                FlightDetailsMapFragment.newInstance(flight).apply {
-                    onMapTouch = {
-                        findViewById<NestedScrollView>(R.id.flight_details_scrollview)?.requestDisallowInterceptTouchEvent(true)
-                    }
-                },
-                TAG_FLIGHT_DETAILS_FRAGMENT
+            R.id.flight_details_fragment_container,
+            FlightDetailsMapFragment.newInstance(flight).apply {
+                onMapTouch = {
+                    findViewById<NestedScrollView>(R.id.flight_details_scrollview)?.requestDisallowInterceptTouchEvent(
+                        true
+                    )
+                }
+            },
+            TAG_FLIGHT_DETAILS_FRAGMENT
         )
         currentFragment = FlightDetailsCurrentFragment.MAP
         flight_details_toggle_fab.setDrawable(R.drawable.info)
@@ -102,9 +97,9 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
     private fun showInfoFragment() {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(
-                R.id.flight_details_fragment_container,
-                FlightDetailsInfoFragment.newInstance(flight),
-                TAG_FLIGHT_DETAILS_FRAGMENT
+            R.id.flight_details_fragment_container,
+            FlightDetailsInfoFragment.newInstance(flight),
+            TAG_FLIGHT_DETAILS_FRAGMENT
         )
         flight_details_toggle_fab.setDrawable(R.drawable.map)
         currentFragment = FlightDetailsCurrentFragment.INFO
@@ -144,11 +139,11 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
 
     private fun setupObservers() {
         viewModel.state.map { it?.flightDetails }
-                .nonNull()
-                .observeNonNulls(this) {
-                    flight_details_loading_progress_bar?.hideView()
-                    updateViews(it)
-                }
+            .nonNull()
+            .observeNonNulls(this) {
+                flight_details_loading_progress_bar?.hideView()
+                updateViews(it)
+            }
     }
 
     private fun updateViews(flightDetails: FlightDetails) {
@@ -156,13 +151,13 @@ class FlightDetailsActivity : AppCompatActivity(), Injectable, HasSupportFragmen
         flight_details_aircraft_image_view.setImageResource(R.drawable.aircraft_image_placeholder)
         if (flightDetails.imageUrl != null) {
             Picasso.get()
-                    .load(flightDetails.imageUrl)
-                    .placeholder(R.drawable.aircraft_image_placeholder)
-                    .error(R.drawable.aircraft_image_placeholder)
-                    .into(flight_details_aircraft_image_view, object : Callback {
-                        override fun onError(e: Exception?) = onNoAircraftImageAvailable()
-                        override fun onSuccess() = Unit
-                    })
+                .load(flightDetails.imageUrl)
+                .placeholder(R.drawable.aircraft_image_placeholder)
+                .error(R.drawable.aircraft_image_placeholder)
+                .into(flight_details_aircraft_image_view, object : Callback {
+                    override fun onError(e: Exception?) = onNoAircraftImageAvailable()
+                    override fun onSuccess() = Unit
+                })
         } else {
             onNoAircraftImageAvailable()
         }

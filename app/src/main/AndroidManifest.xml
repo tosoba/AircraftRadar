@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
 
         <meta-data
@@ -19,12 +20,14 @@
 
         <activity
             android:name="com.example.map.ui.MapActivity"
+            android:exported="true"
             android:label="@string/title_activity_map">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.example.flightdetails.ui.FlightDetailsActivity"
             android:label="@string/title_activity_flight_details"
@@ -34,6 +37,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.map.ui.MapActivity" />
         </activity>
+
     </application>
 
 </manifest>

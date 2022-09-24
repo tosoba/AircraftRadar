@@ -9,12 +9,12 @@ import com.example.flightdetails.R
 import kotlinx.android.synthetic.main.fragment_flight_details_info_item.view.*
 
 class FlightDetailsInfoAdapter(
-        items: List<Pair<String, String>>
+    items: List<Pair<String, String>>
 ) : FlightInfoBaseAdapter<FlightDetailsInfoAdapter.ViewHolder>(items) {
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_flight_details_info_item, parent, false)
-        return FlightDetailsInfoAdapter.ViewHolder(view)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.fragment_flight_details_info_item, parent, false)
+        return ViewHolder(view)
     }
 
     class ViewHolder(itemView: View) : FlightInfoBaseAdapter.ViewHolder(itemView) {

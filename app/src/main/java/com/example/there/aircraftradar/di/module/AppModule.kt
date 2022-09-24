@@ -1,9 +1,9 @@
 package com.example.there.aircraftradar.di.module
 
 import android.app.Application
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.coreandroid.coroutine.CoroutineContextProvider
 import com.example.coreandroid.di.vm.ViewModelFactory
 import com.example.coreandroid.di.vm.ViewModelKey
@@ -24,7 +24,6 @@ import dagger.multibindings.IntoMap
 
 @Module
 abstract class AppModule {
-
     @Binds
     abstract fun bindContext(application: Application): Context
 
@@ -52,19 +51,18 @@ abstract class AppModule {
 
     @Module
     companion object {
-
         @Provides
         @JvmStatic
         fun flightsFeature(
-                coroutineContextProvider: CoroutineContextProvider,
-                repository: IMapRepository
+            coroutineContextProvider: CoroutineContextProvider,
+            repository: IMapRepository
         ): FlightsFeature = FlightsFeature(coroutineContextProvider, repository)
 
         @Provides
         @JvmStatic
         fun flightDetailsFeature(
-                coroutineContextProvider: CoroutineContextProvider,
-                repository: IFlightDetailsRepository
+            coroutineContextProvider: CoroutineContextProvider,
+            repository: IFlightDetailsRepository
         ): FlightDetailsFeature = FlightDetailsFeature(coroutineContextProvider, repository)
     }
 }

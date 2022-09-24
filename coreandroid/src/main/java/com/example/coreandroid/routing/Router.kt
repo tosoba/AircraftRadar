@@ -1,6 +1,6 @@
 package com.example.coreandroid.routing
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.example.coreandroid.model.Flight
 
 interface Router {

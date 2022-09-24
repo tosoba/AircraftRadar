@@ -1,11 +1,11 @@
 package com.example.coreandroid.view
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 
 abstract class FlightInfoBaseAdapter<VH>(
-        var items: List<Pair<String, String>>
+    var items: List<Pair<String, String>>
 ) : RecyclerView.Adapter<VH>() where VH : FlightInfoBaseAdapter.ViewHolder {
 
     override fun getItemCount(): Int = items.size

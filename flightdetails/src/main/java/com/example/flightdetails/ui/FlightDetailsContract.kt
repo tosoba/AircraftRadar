@@ -1,6 +1,6 @@
 package com.example.flightdetails.ui
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import com.example.coreandroid.model.FlightDetails
 import com.example.flightdetails.domain.feature.FlightDetailsFeature
 import com.example.flightdetails.ui.fragment.SharesFlightDetails

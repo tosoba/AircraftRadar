@@ -1,25 +1,25 @@
 package com.example.coreandroid.lifecycle;
 
 import android.app.Activity;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.provider.Settings;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+
 import com.example.coreandroid.R;
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-
 
 public class ConnectivityComponent implements LifecycleObserver {
     private final Activity activity;
@@ -50,12 +50,9 @@ public class ConnectivityComponent implements LifecycleObserver {
         internetDisposable = ReactiveNetwork.observeInternetConnectivity()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean isConnectedToInternet) {
-                        lastConnectionStatus = isConnectedToInternet;
-                        handleConnectionStatus(isConnectedToInternet);
-                    }
+                .subscribe(isConnectedToInternet -> {
+                    lastConnectionStatus = isConnectedToInternet;
+                    handleConnectionStatus(isConnectedToInternet);
                 });
     }
 
@@ -95,12 +92,9 @@ public class ConnectivityComponent implements LifecycleObserver {
     private void showNoConnectionDialog() {
         snackbar = Snackbar
                 .make(parentView, "No internet connection.", Snackbar.LENGTH_LONG)
-                .setAction("Settings", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent settingsIntent = new Intent(Settings.ACTION_SETTINGS);
-                        activity.startActivity(settingsIntent);
-                    }
+                .setAction("Settings", view -> {
+                    Intent settingsIntent = new Intent(Settings.ACTION_SETTINGS);
+                    activity.startActivity(settingsIntent);
                 })
                 .setCallback(new Snackbar.Callback() {
                     @Override
@@ -112,10 +106,10 @@ public class ConnectivityComponent implements LifecycleObserver {
                 })
                 .setActionTextColor(ContextCompat.getColor(activity, R.color.colorPrimary));
 
-        TextView textView = snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        TextView textView = snackbar.getView().findViewById(R.id.snackbar_text);
         textView.setTextColor(ContextCompat.getColor(activity, R.color.colorPrimary));
         snackbar.getView().setBackgroundColor(Color.LTGRAY);
-        snackbar.setDuration(Snackbar.LENGTH_INDEFINITE);
+        snackbar.setDuration(BaseTransientBottomBar.LENGTH_INDEFINITE);
         snackbar.show();
     }
 

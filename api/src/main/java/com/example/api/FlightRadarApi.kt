@@ -11,7 +11,7 @@ interface FlightRadarApi {
 
     @GET("clickhandler")
     fun loadFlightDetails(
-            @Query("flight") flightId: String,
-            @Query("version") version: String = "1.5"
+        @Query("flight") flightId: String,
+        @Query("version") version: String = "1.5"
     ): Call<FlightDetails>
 }

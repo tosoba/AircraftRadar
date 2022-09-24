@@ -10,10 +10,10 @@ import com.example.map.domain.repo.IMapRepository
 import javax.inject.Inject
 
 class MapRepository @Inject constructor(
-        private val api: FlightRadarApi
+    private val api: FlightRadarApi
 ) : IMapRepository {
 
     override suspend fun loadFlights(): Result<List<Flight>> = api.loadFlights()
-            .awaitResult()
-            .mapSuccess(FlightsMapper::fromEntity)
+        .awaitResult()
+        .mapSuccess(FlightsMapper::fromEntity)
 }

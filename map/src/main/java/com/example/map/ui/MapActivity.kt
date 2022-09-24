@@ -1,12 +1,9 @@
 package com.example.map.ui
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.support.design.widget.BottomSheetDialog
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import android.view.WindowManager
+import androidx.lifecycle.ViewModelProviders
 import com.androidmapsextensions.*
 import com.example.core.di.Injectable
 import com.example.coreandroid.di.ViewModelFactory
@@ -20,32 +17,24 @@ import com.example.map.ui.flight.FlightInfoDialogAdapter
 import com.example.map.ui.flight.FlightMarker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.shopify.livedataktx.filter
 import com.shopify.livedataktx.map
-import com.shopify.livedataktx.nonNull
 import com.shopify.livedataktx.observe
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.flight_details_dialog.view.*
 import javax.inject.Inject
 
-
-class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector {
-
-    @Inject
-    lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentDispatchingAndroidInjector
-
+class MapActivity : DaggerAppCompatActivity(), HasAndroidInjector, Injectable {
     private lateinit var map: GoogleMap
     private val currentFlightMarkers = HashMap<String, FlightMarker>()
     private var declusterifiedMarkers = ArrayList<Marker>()
     private val clusteringSettings: ClusteringSettings by lazy {
         ClusteringSettings()
-                .clusterOptionsProvider(FlightClusterOptionsProvider(resources))
-                .addMarkersDynamically(true)
+            .clusterOptionsProvider(FlightClusterOptionsProvider(resources))
+            .addMarkersDynamically(true)
     }
     private val onMarkerClickListener: GoogleMap.OnMarkerClickListener by lazy {
         GoogleMap.OnMarkerClickListener { marker ->
@@ -75,6 +64,7 @@ class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: MapContract.ViewModel by lazy {
+
         ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java)
     }
 
@@ -98,10 +88,10 @@ class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector 
         initMap(savedInstanceState)
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState?.putLong(KEY_TIME_TILL_NEXT_LOAD, timeTillNextLoad)
-        outState?.putBoolean(KEY_INITIAL_LOAD_COMPLETED, initialLoadCompleted)
+        outState.putLong(KEY_TIME_TILL_NEXT_LOAD, timeTillNextLoad)
+        outState.putBoolean(KEY_INITIAL_LOAD_COMPLETED, initialLoadCompleted)
     }
 
     private fun declusterify(cluster: Marker) {
@@ -118,7 +108,8 @@ class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector 
     }
 
     private fun initMap(savedInstanceState: Bundle?) {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.radar_map_fragment) as SupportMapFragment
+        val mapFragment =
+            supportFragmentManager.findFragmentById(R.id.radar_map_fragment) as SupportMapFragment
         mapFragment.getExtendedMapAsync {
             map = it
             setupObservers()
@@ -146,13 +137,13 @@ class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector 
     }
 
     private fun setupObservers() {
-        viewModel.state.nonNull()
-                .map { it.flights }
-                .filter { it.isNotEmpty() }
-                .observe {
-                    addFlights(it)
-                    loading_progress_bar?.hideView()
-                }
+        viewModel.state
+            .map { it?.flights ?: emptyList() }
+            .filter { it?.isNotEmpty() ?: false }
+            .observe {
+                addFlights(it!!)
+                loading_progress_bar?.hideView()
+            }
     }
 
     private fun initLoadingTimer() {
@@ -176,7 +167,9 @@ class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector 
         updatedFlights.forEach { flight ->
             currentFlightMarkers[flight.callsign]?.let {
                 it.flight = flight
-                if (map.bounds.contains(it.marker.position) && !it.marker.isCluster) it.marker.animatePosition(flight.position)
+                if (map.bounds.contains(it.marker.position) && !it.marker.isCluster) it.marker.animatePosition(
+                    flight.position
+                )
                 else it.marker.animatePosition(flight.position, AnimationSettings().duration(1L))
             } ?: run {
                 val marker = map.addFlight(flight)
@@ -187,10 +180,15 @@ class MapActivity : AppCompatActivity(), Injectable, HasSupportFragmentInjector 
     }
 
     private fun showFlightDetailsDialog(flight: Flight) {
-        val dialog = BottomSheetDialog(this)
+        val dialog =
+            BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.flight_details_dialog, null)
         with(view) {
-            flight_info_dialog_recycler_view.setLayoutManager(this@MapActivity, screenOrientation, 2)
+            flight_info_dialog_recycler_view.setLayoutManager(
+                this@MapActivity,
+                screenOrientation,
+                2
+            )
             flight_info_dialog_recycler_view.adapter = FlightInfoDialogAdapter(flight.info)
             dialog_more_btn.setOnClickListener {
                 dialog.dismiss()

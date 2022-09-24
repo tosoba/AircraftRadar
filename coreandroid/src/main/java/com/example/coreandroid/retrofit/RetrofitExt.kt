@@ -15,7 +15,6 @@ import java.net.ConnectException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-
 private val serverErrorCodes = 500..600
 private val authenticationErrorCodes = 400..499
 
@@ -43,10 +42,10 @@ private fun <T : Any> makeDataInvalidator(): (Result<T>) -> Boolean = { data ->
 }
 
 private suspend fun <T : Any> attemptProvideData(
-        dataProvider: suspend () -> Result<T>,
-        dataInvalidator: (Result<T>) -> Boolean,
-        retryTimes: Int = DEFAULT_RETRY_ATTEMPTS,
-        repeatDelay: Long = REPEAT_DELAY
+    dataProvider: suspend () -> Result<T>,
+    dataInvalidator: (Result<T>) -> Boolean,
+    retryTimes: Int = DEFAULT_RETRY_ATTEMPTS,
+    repeatDelay: Long = REPEAT_DELAY
 ): Result<T> {
     repeat(retryTimes - 1) {
         val data = dataProvider()
@@ -84,8 +83,8 @@ suspend fun <T : Any> Call<T>.awaitResult(): Result<T> {
     }
 
     return attemptProvideData(
-            dataProvider = makeDataProvider(callWrapper),
-            dataInvalidator = makeDataInvalidator()
+        dataProvider = makeDataProvider(callWrapper),
+        dataInvalidator = makeDataInvalidator()
     )
 }
 
@@ -105,8 +104,8 @@ suspend fun <T : Mappable<R>, R : Any> Call<T>.awaitMappableResult(): Result<R> 
     }
 
     return attemptProvideData(
-            dataProvider = makeDataProvider(callWrapper),
-            dataInvalidator = makeDataInvalidator()
+        dataProvider = makeDataProvider(callWrapper),
+        dataInvalidator = makeDataInvalidator()
     )
 }
 

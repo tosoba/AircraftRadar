@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    <fragment
         android:id="@+id/radar_map_fragment"
         android:name="com.androidmapsextensions.SupportMapFragment"
         android:layout_width="match_parent"

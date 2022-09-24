@@ -9,12 +9,11 @@ import kotlinx.coroutines.*
 import org.greenrobot.eventbus.EventBus
 import kotlin.coroutines.CoroutineContext
 
-
 abstract class CoroutineFeature<State : Any, Action : FeatureAction, Event : Any>(
-        private val contextProvider: CoroutineContextProvider,
-        initialState: State,
-        reducer: Reducer<Action, State>,
-        eventFactory: EventFactory<Action, State, Event>? = null
+    private val contextProvider: CoroutineContextProvider,
+    initialState: State,
+    reducer: Reducer<Action, State>,
+    eventFactory: EventFactory<Action, State, Event>? = null
 ) : BaseFeature<State, Action, Event>(initialState, reducer, eventFactory), CoroutineScope {
 
     private val jobs = mutableListOf<Job>()
@@ -44,11 +43,11 @@ abstract class CoroutineFeature<State : Any, Action : FeatureAction, Event : Any
     }
 
     protected suspend fun <T : Any> defer(
-            dataProvider: suspend () -> T
+        dataProvider: suspend () -> T
     ): Deferred<T> = async(background) { dataProvider() }
 
     protected suspend fun <T : Any> loadDeferred(
-            dataProvider: suspend () -> T
+        dataProvider: suspend () -> T
     ): T = async(background) { dataProvider() }.run {
         jobs.add(this)
         await()

@@ -12,33 +12,35 @@ import com.example.coreandroid.model.Flight
 import com.example.map.domain.repo.IMapRepository
 import javax.inject.Inject
 
-
 class FlightsFeature @Inject constructor(
-        contextProvider: CoroutineContextProvider,
-        private val mapRepository: IMapRepository
+    contextProvider: CoroutineContextProvider,
+    private val mapRepository: IMapRepository
 ) : CoroutineFeature<FlightsFeature.State, FlightsFeature.Action, ErrorEvent>(
-        contextProvider = contextProvider,
-        initialState = FlightsFeature.State.INITIAL,
-        reducer = { action, previousState ->
-            if (action is Action.SetFlights) previousState.copy(
-                    loading = false,
-                    flights = action.newFlights
-            ) else previousState
-        },
-        eventFactory = { action, _ ->
-            if (action is Action.PostErrorEvent) ErrorEvent(action.throwable)
-            null
-        }
+    contextProvider = contextProvider,
+    initialState = State.INITIAL,
+    reducer = { action, previousState ->
+        if (action is Action.SetFlights) previousState.copy(
+            loading = false,
+            flights = action.newFlights
+        ) else previousState
+    },
+    eventFactory = { action, _ ->
+        if (action is Action.PostErrorEvent) ErrorEvent(action.throwable)
+        null
+    }
 ) {
-    override val middleware: CoroutineMiddleware<Action, State>? = { action, _, dispatchPrivate ->
+    override val middleware: CoroutineMiddleware<Action, State> = { action, _, dispatchPrivate ->
         when (action) {
             is Action.Load -> {
-                val flightsResult = loadDeferred(mapRepository::loadFlights)
-                when (flightsResult) {
+                when (val flightsResult = loadDeferred(mapRepository::loadFlights)) {
                     is Success -> Action.SetFlights(flightsResult.data)
                     is Failure -> {
-                        dispatchPrivate(Action.PostErrorEvent(flightsResult.error
-                                ?: Exception(BaseFeature.UNKNOWN_ERROR_MSG)))
+                        dispatchPrivate(
+                            Action.PostErrorEvent(
+                                flightsResult.error
+                                    ?: Exception(BaseFeature.UNKNOWN_ERROR_MSG)
+                            )
+                        )
                         null
                     }
                 }

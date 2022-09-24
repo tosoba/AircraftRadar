@@ -6,11 +6,10 @@ import com.example.coreandroid.arch.Middleware
 import com.example.coreandroid.arch.Reducer
 import org.greenrobot.eventbus.EventBus
 
-
 abstract class SimpleFeature<State : Any, Action : FeatureAction, Event : Any>(
-        initialState: State,
-        reducer: Reducer<Action, State>,
-        eventFactory: EventFactory<Action, State, Event>? = null
+    initialState: State,
+    reducer: Reducer<Action, State>,
+    eventFactory: EventFactory<Action, State, Event>? = null
 ) : BaseFeature<State, Action, Event>(initialState, reducer, eventFactory) {
 
     open val middleware: Middleware<Action, State>? = null

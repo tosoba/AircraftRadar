@@ -8,10 +8,9 @@ import com.example.flightdetails.domain.repo.IFlightDetailsRepository
 import javax.inject.Inject
 
 class FlightDetailsRepository @Inject constructor(
-        private val api: FlightRadarApi
+    private val api: FlightRadarApi
 ) : IFlightDetailsRepository {
-
     override suspend fun loadFlightDetails(
-            flightId: String
+        flightId: String
     ): Result<FlightDetails> = api.loadFlightDetails(flightId).awaitResult()
 }

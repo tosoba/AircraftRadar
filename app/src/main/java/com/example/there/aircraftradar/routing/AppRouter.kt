@@ -1,7 +1,7 @@
 package com.example.there.aircraftradar.routing
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.example.coreandroid.model.Flight
 import com.example.coreandroid.routing.Router
 import com.example.flightdetails.ui.FlightDetailsActivity

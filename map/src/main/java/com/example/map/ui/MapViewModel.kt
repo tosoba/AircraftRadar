@@ -1,13 +1,12 @@
 package com.example.map.ui
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.example.map.domain.feature.FlightsFeature
 import javax.inject.Inject
 
-
 class MapViewModel @Inject constructor(
-        private val flightsFeature: FlightsFeature
+    private val flightsFeature: FlightsFeature
 ) : ViewModel(), MapContract.ViewModel {
 
     override val state: LiveData<FlightsFeature.State>

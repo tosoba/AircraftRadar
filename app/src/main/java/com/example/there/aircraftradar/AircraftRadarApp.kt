@@ -1,22 +1,20 @@
 package com.example.there.aircraftradar
 
-import android.app.Activity
-import android.app.Application
 import com.example.there.aircraftradar.di.AppInjector
+import com.example.there.aircraftradar.di.DaggerAppComponent
 import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
-import javax.inject.Inject
+import dagger.android.DaggerApplication
 
-class AircraftRadarApp : Application(), HasActivityInjector {
-
-    @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
-
+class AircraftRadarApp : DaggerApplication() {
     override fun onCreate() {
         super.onCreate()
         AppInjector.init(this)
     }
 
-    override fun activityInjector(): AndroidInjector<Activity> = dispatchingAndroidInjector
+    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+        return DaggerAppComponent
+            .builder()
+            .application(this)
+            .build()
+    }
 }

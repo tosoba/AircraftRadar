@@ -1,6 +1,6 @@
 package com.example.map.ui
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import com.example.map.domain.feature.FlightsFeature
 
 interface MapContract {

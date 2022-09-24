@@ -17,9 +17,7 @@ import com.example.flightdetails.ui.fragment.FlightDetailsFragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 
-
 class FlightDetailsMapFragment : FlightDetailsFragment() {
-
     private lateinit var map: GoogleMap
     private var flightMarker: Marker? = null
     private var routeBounds: LatLngBounds? = null
@@ -30,7 +28,11 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
             field = value
         }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_flight_details_map, container, false)
     }
 
@@ -39,7 +41,8 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
     }
 
     private fun initMap() {
-        val mapFragment = childFragmentManager.findFragmentById(R.id.flight_details_map_fragment) as ScrollViewMapFragment
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.flight_details_map_fragment) as ScrollViewMapFragment
         mapFragment.onTouch = onMapTouch
         mapFragment.getExtendedMapAsync {
             map = it
@@ -69,14 +72,17 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
             map.addMarker(MarkerOptions().position(origin.latLng).title(origin.name))
             map.addMarker(MarkerOptions().position(destination.latLng).title(destination.name))
 
-            routeBounds = LatLngBounds.builder().makeBounds(origin.latLng!!, flight.position, destination.latLng!!)
+            routeBounds = LatLngBounds.builder()
+                .makeBounds(origin.latLng!!, flight.position, destination.latLng!!)
 
             moveCameraToRouteBounds()
         }
     }
 
     private fun moveCameraToRouteBounds() {
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(routeBounds, 300))
+        routeBounds?.let {
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(it, 300))
+        }
     }
 
     private fun moveCameraToFlight() {
@@ -85,7 +91,7 @@ class FlightDetailsMapFragment : FlightDetailsFragment() {
 
     companion object {
         fun newInstance(
-                flight: Flight
+            flight: Flight
         ): FlightDetailsMapFragment = FlightDetailsMapFragment().apply { putArguments(flight) }
     }
 }

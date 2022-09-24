@@ -1,14 +1,11 @@
 package com.example.coreandroid.ext
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 
 fun <T : Any> LiveData<T?>.observeNonNulls(
-        lifecycleOwner: LifecycleOwner,
-        onNext: (T) -> Unit
+    lifecycleOwner: LifecycleOwner,
+    onNext: (T) -> Unit
 ) {
-    observe(lifecycleOwner, Observer {
-        it?.let(onNext)
-    })
+    observe(lifecycleOwner) { it?.let(onNext) }
 }

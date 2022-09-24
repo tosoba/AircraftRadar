@@ -8,19 +8,21 @@ import com.example.there.aircraftradar.di.module.BuildersModule
 import com.example.there.aircraftradar.di.module.CoroutineModule
 import dagger.BindsInstance
 import dagger.Component
+import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [
-    AndroidSupportInjectionModule::class,
-    AppModule::class,
-    ApiModule::class,
-    CoroutineModule::class,
-    BuildersModule::class
-])
-interface AppComponent {
-
+@Component(
+    modules = [
+        AndroidSupportInjectionModule::class,
+        AppModule::class,
+        ApiModule::class,
+        CoroutineModule::class,
+        BuildersModule::class
+    ]
+)
+interface AppComponent : AndroidInjector<AircraftRadarApp> {
     @Component.Builder
     interface Builder {
         @BindsInstance
@@ -28,6 +30,4 @@ interface AppComponent {
 
         fun build(): AppComponent
     }
-
-    fun inject(app: AircraftRadarApp)
 }

@@ -24,7 +24,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Rect;
-import android.support.v4.util.LruCache;
+
+import androidx.collection.LruCache;
 
 import com.androidmapsextensions.ClusterOptions;
 import com.androidmapsextensions.ClusterOptionsProvider;
@@ -36,7 +37,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import java.util.List;
 
 public class FlightClusterOptionsProvider implements ClusterOptionsProvider {
-
     private static final int[] res = {R.drawable.m1, R.drawable.m2, R.drawable.m3, R.drawable.m4, R.drawable.m5};
 
     private static final int[] forCounts = {10, 100, 1000, 10000, Integer.MAX_VALUE};
